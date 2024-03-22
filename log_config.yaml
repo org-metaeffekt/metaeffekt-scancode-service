@@ -1,0 +1,26 @@
+version: 1
+disable_existing_loggers: False
+formatters:
+  simple:
+    format: '%(asctime)s - %(name)s - %(levelname)s - %(message)s'
+handlers:
+  stderr:
+    class: logging.StreamHandler
+    level: WARNING
+    formatter: simple
+    stream: ext://sys.stderr
+  file:
+    class: logging.handlers.RotatingFileHandler
+    level: INFO
+    formatter: simple
+    filename: scancode-service.log
+loggers:
+  uvicorn:
+    level: INFO
+  scanservice:
+    level: INFO
+  root:
+    level: INFO
+    handlers:
+    - stderr
+    - file

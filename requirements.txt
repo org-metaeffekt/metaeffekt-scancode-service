@@ -1,0 +1,6 @@
+scancode-toolkit==32.0.8
+fastapi[all]==0.109.2
+pytest-asyncio
+click
+faker
+faker-file

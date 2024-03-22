@@ -1,0 +1,242 @@
+{
+  "headers": [
+    {
+      "tool_name": null,
+      "tool_version": "",
+      "options": {},
+      "notice": "",
+      "start_timestamp": null,
+      "end_timestamp": null,
+      "output_format_version": null,
+      "duration": null,
+      "message": null,
+      "errors": [],
+      "warnings": [],
+      "extra_data": {
+        "files_count": 33
+      }
+    }
+  ],
+  "files": [
+    {
+      "path": "samples",
+      "type": "directory",
+      "scan_errors": []
+    },
+    {
+      "path": "samples/README",
+      "type": "file",
+      "scan_errors": []
+    },
+    {
+      "path": "samples/screenshot.png",
+      "type": "file",
+      "scan_errors": []
+    },
+    {
+      "path": "samples/arch",
+      "type": "directory",
+      "scan_errors": []
+    },
+    {
+      "path": "samples/arch/zlib.tar.gz",
+      "type": "file",
+      "scan_errors": []
+    },
+    {
+      "path": "samples/JGroups",
+      "type": "directory",
+      "scan_errors": []
+    },
+    {
+      "path": "samples/JGroups/EULA",
+      "type": "file",
+      "scan_errors": []
+    },
+    {
+      "path": "samples/JGroups/LICENSE",
+      "type": "file",
+      "scan_errors": []
+    },
+    {
+      "path": "samples/JGroups/licenses",
+      "type": "directory",
+      "scan_errors": []
+    },
+    {
+      "path": "samples/JGroups/licenses/apache-1.1.txt",
+      "type": "file",
+      "scan_errors": []
+    },
+    {
+      "path": "samples/JGroups/licenses/apache-2.0.txt",
+      "type": "file",
+      "scan_errors": []
+    },
+    {
+      "path": "samples/JGroups/licenses/bouncycastle.txt",
+      "type": "file",
+      "scan_errors": []
+    },
+    {
+      "path": "samples/JGroups/licenses/cpl-1.0.txt",
+      "type": "file",
+      "scan_errors": []
+    },
+    {
+      "path": "samples/JGroups/licenses/lgpl.txt",
+      "type": "file",
+      "scan_errors": []
+    },
+    {
+      "path": "samples/JGroups/src",
+      "type": "directory",
+      "scan_errors": []
+    },
+    {
+      "path": "samples/JGroups/src/FixedMembershipToken.java",
+      "type": "file",
+      "scan_errors": []
+    },
+    {
+      "path": "samples/JGroups/src/GuardedBy.java",
+      "type": "file",
+      "scan_errors": []
+    },
+    {
+      "path": "samples/JGroups/src/ImmutableReference.java",
+      "type": "file",
+      "scan_errors": []
+    },
+    {
+      "path": "samples/JGroups/src/RATE_LIMITER.java",
+      "type": "file",
+      "scan_errors": []
+    },
+    {
+      "path": "samples/JGroups/src/RouterStub.java",
+      "type": "file",
+      "scan_errors": []
+    },
+    {
+      "path": "samples/JGroups/src/RouterStubManager.java",
+      "type": "file",
+      "scan_errors": []
+    },
+    {
+      "path": "samples/JGroups/src/S3_PING.java",
+      "type": "file",
+      "scan_errors": []
+    },
+    {
+      "path": "samples/zlib",
+      "type": "directory",
+      "scan_errors": []
+    },
+    {
+      "path": "samples/zlib/adler32.c",
+      "type": "file",
+      "scan_errors": []
+    },
+    {
+      "path": "samples/zlib/deflate.c",
+      "type": "file",
+      "scan_errors": []
+    },
+    {
+      "path": "samples/zlib/deflate.h",
+      "type": "file",
+      "scan_errors": []
+    },
+    {
+      "path": "samples/zlib/zlib.h",
+      "type": "file",
+      "scan_errors": []
+    },
+    {
+      "path": "samples/zlib/zutil.c",
+      "type": "file",
+      "scan_errors": []
+    },
+    {
+      "path": "samples/zlib/zutil.h",
+      "type": "file",
+      "scan_errors": []
+    },
+    {
+      "path": "samples/zlib/ada",
+      "type": "directory",
+      "scan_errors": []
+    },
+    {
+      "path": "samples/zlib/ada/zlib.ads",
+      "type": "file",
+      "scan_errors": []
+    },
+    {
+      "path": "samples/zlib/dotzlib",
+      "type": "directory",
+      "scan_errors": []
+    },
+    {
+      "path": "samples/zlib/dotzlib/AssemblyInfo.cs",
+      "type": "file",
+      "scan_errors": []
+    },
+    {
+      "path": "samples/zlib/dotzlib/ChecksumImpl.cs",
+      "type": "file",
+      "scan_errors": []
+    },
+    {
+      "path": "samples/zlib/dotzlib/LICENSE_1_0.txt",
+      "type": "file",
+      "scan_errors": []
+    },
+    {
+      "path": "samples/zlib/dotzlib/readme.txt",
+      "type": "file",
+      "scan_errors": []
+    },
+    {
+      "path": "samples/zlib/gcc_gvmat64",
+      "type": "directory",
+      "scan_errors": []
+    },
+    {
+      "path": "samples/zlib/gcc_gvmat64/gvmat64.S",
+      "type": "file",
+      "scan_errors": []
+    },
+    {
+      "path": "samples/zlib/infback9",
+      "type": "directory",
+      "scan_errors": []
+    },
+    {
+      "path": "samples/zlib/infback9/infback9.c",
+      "type": "file",
+      "scan_errors": []
+    },
+    {
+      "path": "samples/zlib/infback9/infback9.h",
+      "type": "file",
+      "scan_errors": []
+    },
+    {
+      "path": "samples/zlib/iostream2",
+      "type": "directory",
+      "scan_errors": []
+    },
+    {
+      "path": "samples/zlib/iostream2/zstream.h",
+      "type": "file",
+      "scan_errors": []
+    },
+    {
+      "path": "samples/zlib/iostream2/zstream_test.cpp",
+      "type": "file",
+      "scan_errors": []
+    }
+  ]
+}
