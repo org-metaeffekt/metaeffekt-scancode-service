@@ -27,15 +27,15 @@ def replace_scan_singleton(monkeypatch):
     monkeypatch.setattr(scancode_extensions.service, "scan", FakeScan())
 
 
-def test_post_requests_accepts_path_and_output_file(replace_scan_singleton, samples_folder):
-    response = client.post("/scan/", json={"scan_path": f"{samples_folder}",
+def test_post_requests_accepts_path_and_output_file(replace_scan_singleton):
+    response = client.post("/scan/", json={"scan_path": "/home/kai/projekte/metaeffekt/scancode-toolkit/samples/",
                                            "output_file": "result.json"})
     assert response.status_code == 200
 
 
-def test_post_returns_json_with_uuid(replace_scan_singleton, samples_folder):
+def test_post_returns_json_with_uuid(replace_scan_singleton):
     workload = {
-        "scan_path": f"{samples_folder}",
+        "scan_path": "/home/kai/projekte/metaeffekt/scancode-toolkit/samples/",
         "output_file": "result.json"
     }
 
@@ -45,15 +45,14 @@ def test_post_returns_json_with_uuid(replace_scan_singleton, samples_folder):
     assert response.json()["uuid"] == "Any_UUID"
 
 
+@pytest.mark.parametrize("paths", ["/home/kai/projekte/metaeffekt/scancode-toolkit/samples/", ])
 @pytest.mark.skip("Long running test.")
-@pytest.mark.asyncio
-def test_multi_post(tmp_path, samples_folder, faker):
-    paths = [samples_folder]
+def test_multi_post(tmp_path, paths, faker):
     output_file = os.path.join(tmp_path, faker.file_name(extension="json"))
 
     for scan_path in paths:
         workload = {
-            "scan_path": f"{scan_path}",
+            "scan_path": scan_path,
             "output_file": output_file
         }
 
@@ -63,7 +62,7 @@ def test_multi_post(tmp_path, samples_folder, faker):
         assert "uuid" in response.json()
 
 
-@pytest.mark.parametrize("root", ["/tmp/netty_intermediate/", ])
+@pytest.mark.parametrize("root", ["/home/kai/netty_intermediate/", ])
 @pytest.mark.skip("Long running test.")
 def test_multi_post_subfolder_scan(tmp_path, root, faker):
     output_file = os.path.join(tmp_path, faker.file_name(extension="json"))
