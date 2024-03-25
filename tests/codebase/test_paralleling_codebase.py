@@ -1,6 +1,6 @@
 import pytest
 import pytest_asyncio
-from scancode.cli import ScancodeCodebase as Codebase
+from scancode_extensions.resource import ScancodeCodebase as Codebase
 
 from scancode_extensions.service import MergeThread
 

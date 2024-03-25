@@ -5,7 +5,7 @@ import time
 
 import pytest
 from cluecode.plugin_copyright import CopyrightScanner
-from scancode.cli import ScancodeCodebase as Codebase
+from scancode_extensions.resource import ScancodeCodebase as Codebase
 from licensedcode.plugin_license import LicenseScanner
 from scancode.plugin_info import InfoScanner
 
@@ -57,7 +57,7 @@ async def test_scanner_async(scan, populated_cache):
 
 
 @pytest.mark.asyncio
-async def test_scanner_async(scan, populated_cache, fifty_folders_each_contains_single_file):
+async def test_scanner_async_with_many_small_files(scan, populated_cache, fifty_folders_each_contains_single_file):
     file = await scan.execute(fifty_folders_each_contains_single_file)
     assert "/tmp" in file
 

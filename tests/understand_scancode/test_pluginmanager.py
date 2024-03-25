@@ -5,24 +5,10 @@ import pytest
 from commoncode.resource import Codebase
 from formattedcode.output_json import JsonPrettyOutput
 from licensedcode.plugin_license import LicenseScanner
-from scancode.cli import ScancodeCodebase
+from scancode_extensions.resource import ScancodeCodebase
 from scancode.plugin_info import InfoScanner
 
 from scancode_extensions.allrights_plugin import AllrightsCopyrightScanner
-
-
-def test_xxx():
-    # these are important to register plugin managers
-    from plugincode import PluginManager
-
-    assert len(PluginManager.managers) == 5
-
-    mgr: PluginManager
-    for stage, mgr in PluginManager.managers.items():
-        print(f"\n\t------\n\tSetup stage: {stage}")
-        setup = mgr.setup()
-        if setup:
-            print(setup)
 
 
 @dataclass
@@ -79,7 +65,7 @@ class TestFindPluginsNeeded:
 
     def test_update_detected_licenses(self, codebase: Codebase, processed_resources):
         plugin = LicenseScanner()
-        plugin.process_codebase(codebase)
+        plugin.process_codebase(codebase, license_diagnostics=False)
 
     def test_output(self, codebase: Codebase, processed_resources, tmp_path):
         """Save results stored in the codebase into a json file."""
@@ -95,3 +81,4 @@ class TestFindPluginsNeeded:
                 if all(found.values()): break
 
         assert all(found.values())
+        print(f"{output_file}")

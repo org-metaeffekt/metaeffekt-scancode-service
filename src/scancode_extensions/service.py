@@ -15,7 +15,7 @@ from threading import Thread
 import click
 import uvicorn
 from cluecode.plugin_copyright import CopyrightScanner
-from scancode.cli import ScancodeCodebase as Codebase
+from scancode_extensions.resource import ScancodeCodebase as Codebase
 from fastapi import FastAPI, BackgroundTasks
 from formattedcode.output_json import JsonPrettyOutput
 from licensedcode.plugin_license import LicenseScanner
@@ -38,7 +38,6 @@ class Scan:
     output_file: str = field(init=False)
 
     def __post_init__(self):
-        global scancode_config
         self.output_file = os.path.join(scancode_config["output_dir"], f"{self.uuid}_scan.json")
 
     async def create_events(self):
@@ -200,7 +199,7 @@ async def scan_file(file_path: str, background_tasks: BackgroundTasks):
 
 
 @click.command()
-@click.option('--workers', default=4, help="Number of parallel workers.")
+@click.option('--workers', default=1, help="Number of parallel workers.")
 @click.option('--log-config', default="log_config.yaml", help="Configuration file for logging.")
 @click.option('--port', default=8000, help="Port to accept connections.")
 @click.option('--output_dir', help="Where to write output files.")

@@ -1,7 +1,7 @@
 import tempfile
 
 from formattedcode.output_json import write_results
-from scancode.cli import ScancodeCodebase
+from scancode_extensions.resource import ScancodeCodebase
 
 
 def test_use_with_info_adds_basenames(samples_folder, tmp_path):

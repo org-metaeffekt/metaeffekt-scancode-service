@@ -4,7 +4,7 @@ from pathlib import Path
 
 import pytest
 from _pytest.fixtures import FixtureRequest
-from scancode.cli import ScancodeCodebase as Codebase
+from scancode_extensions.resource import ScancodeCodebase as Codebase
 from faker_file.providers.txt_file import TxtFileProvider
 from faker_file.storages.filesystem import FileSystemStorage
 
