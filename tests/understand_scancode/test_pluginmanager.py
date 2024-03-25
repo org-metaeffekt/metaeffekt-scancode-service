@@ -1,22 +1,19 @@
+import tempfile
 from dataclasses import dataclass
 
 import pytest
-from cluecode.plugin_copyright import CopyrightScanner
 from commoncode.resource import Codebase
 from formattedcode.output_json import JsonPrettyOutput
 from licensedcode.plugin_license import LicenseScanner
 from scancode.cli import ScancodeCodebase
 from scancode.plugin_info import InfoScanner
 
+from scancode_extensions.allrights_plugin import AllrightsCopyrightScanner
+
 
 def test_xxx():
     # these are important to register plugin managers
     from plugincode import PluginManager
-    from plugincode import pre_scan
-    from plugincode import scan
-    from plugincode import post_scan
-    from plugincode import output_filter
-    from plugincode import output
 
     assert len(PluginManager.managers) == 5
 
@@ -51,7 +48,7 @@ class TestFindPluginsNeeded:
         """
         return {
             "info": InfoScanner(),
-            "copyright": CopyrightScanner(),
+            "copyright": AllrightsCopyrightScanner(),
             "license": LicenseScanner(),
         }
 
@@ -84,7 +81,17 @@ class TestFindPluginsNeeded:
         plugin = LicenseScanner()
         plugin.process_codebase(codebase)
 
-    def test_output(self, codebase: Codebase, processed_resources):
+    def test_output(self, codebase: Codebase, processed_resources, tmp_path):
         """Save results stored in the codebase into a json file."""
+        output_file = tempfile.mktemp(dir=tmp_path)
         plugin = JsonPrettyOutput()
-        plugin.process_codebase(codebase, output_json_pp="test.json", info=True)
+        plugin.process_codebase(codebase, output_json_pp=output_file)
+
+        found = {"base_name": False, "All rights": False}
+        with open(output_file) as f:
+            for line in f.readlines():
+                for k in found:
+                    found[k] = found[k] or k in line
+                if all(found.values()): break
+
+        assert all(found.values())
