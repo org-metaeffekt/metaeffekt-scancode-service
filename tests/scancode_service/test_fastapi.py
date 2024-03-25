@@ -81,15 +81,16 @@ def test_multi_post_subfolder_scan(tmp_path, root, faker):
             assert "uuid" in response.json()
 
 
-@dataclasses.dataclass
+@dataclasses.dataclass(frozen=True)
 class FakeFuture:
     uuid: str
 
 
 def test_status_contains_list_of_active_scans(monkeypatch):
     monkeypatch.setattr(scan, "tasks",
-                        [FakeFuture("ID_01"), FakeFuture("ID_02"), FakeFuture("ID_03"), FakeFuture("ID_04"), ])
+                        {FakeFuture("ID_01"), FakeFuture("ID_02"), FakeFuture("ID_03"), FakeFuture("ID_04"), })
     response = client.get("/scan")
 
     assert response.status_code == 200
-    assert response.json()['scans'] == ['ID_01', 'ID_02', 'ID_03', 'ID_04']
+    current_scans = response.json()['scans']
+    assert all([id in current_scans for id in ['ID_01', 'ID_02', 'ID_03', 'ID_04']])

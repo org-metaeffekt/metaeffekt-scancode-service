@@ -58,7 +58,7 @@ class ScanEvent:
 class AsynchronousScan:
 
     def __init__(self):
-        self.tasks = []
+        self.tasks = set()
         number_processes = 12
         self.executor = ProcessPoolExecutor(number_processes)
         self.thread_executor = ThreadPoolExecutor(2)
@@ -91,10 +91,10 @@ class AsynchronousScan:
     async def execute(self, scan_request: "ScanRequest"):
         single_scan = Scan(scan_request.scan_path, scan_request.output_file)
         log.info(f"Scan with uuid {single_scan.uuid}: Scanning dir {single_scan.base}.")
-        future = asyncio.create_task(self.scan_base(single_scan))
-        future.add_done_callback(self.tasks.remove)
+        future = asyncio.create_task(self.scan_base(single_scan), name=str(single_scan.uuid))
+        future.add_done_callback(self.tasks.discard)
         future.uuid = str(single_scan.uuid)
-        self.tasks.append(future)
+        self.tasks.add(future)
         return single_scan.uuid
 
     def write_to_json(self, json_file: Path, codebase: Codebase) -> None:

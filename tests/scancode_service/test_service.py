@@ -26,16 +26,6 @@ def printer(shutdown_requested):
     logging.warning("Shutdown requested. Stopping.")
 
 
-def test_xxx():
-    with mp.Manager() as manager:
-        shutdown_requested = manager.Event()
-        p = mp.Process(target=printer, args=(shutdown_requested,))
-        p.start()
-        time.sleep(10)
-        shutdown_requested.set()
-        p.join()
-
-
 @dataclasses.dataclass
 class ScanFinished:
     uuid: str
@@ -52,7 +42,7 @@ async def test_scanner_async(scan, populated_cache, samples_folder):
     await scan.execute(ScanRequest(scan_path=(samples_folder), output_file="/dev/null"))
 
     assert len(scan.tasks) == 1
-    task = scan.tasks[0]
+    task = list(scan.tasks)[0]
     await asyncio.gather(*scan.tasks)
     assert task.done()
 
