@@ -57,10 +57,5 @@ async def thread(codebase: Codebase):
 
 
 @pytest_asyncio.fixture()
-async def codebase(base: str, scan):
-    return Codebase(base, scan.codebase_attributes, scan.resource_attributes)
-
-
-@pytest_asyncio.fixture()
-async def base():
-    return "/home/kai/projekte/metaeffekt/scancode-toolkit/samples"
+async def codebase(samples_folder, scan):
+    return Codebase(samples_folder, scan.codebase_attributes, scan.resource_attributes)

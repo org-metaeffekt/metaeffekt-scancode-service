@@ -10,14 +10,17 @@ from concurrent.futures import ThreadPoolExecutor
 from contextlib import asynccontextmanager
 from dataclasses import field
 from functools import reduce, partial
+from pathlib import Path
 from threading import Thread
+from typing import Any
 
 import click
 import uvicorn
 from cluecode.plugin_copyright import CopyrightScanner
-from fastapi import FastAPI, BackgroundTasks
+from fastapi import FastAPI
 from formattedcode.output_json import JsonPrettyOutput
 from licensedcode.plugin_license import LicenseScanner
+from pydantic import BaseModel
 from scancode.api import get_licenses, get_file_info
 from scancode.plugin_info import InfoScanner
 
@@ -33,12 +36,9 @@ scancode_config = dict(output_dir="/tmp")
 @dataclasses.dataclass
 class Scan:
     base: str
+    output_file: str
     results: list = field(default_factory=list)
     uuid: uuid = field(default_factory=uuid.uuid4)
-    output_file: str = field(init=False)
-
-    def __post_init__(self):
-        self.output_file = os.path.join(scancode_config["output_dir"], f"{self.uuid}_scan.json")
 
     async def create_events(self):
         for _root, dirs, files in os.walk(self.base, topdown=False):
@@ -82,24 +82,24 @@ class AsynchronousScan:
             attributes.update(plugin.codebase_attributes)
         return attributes
 
-    async def execute(self, base_path: str = ""):
-        single_scan = Scan(base_path)
+    async def execute(self, scan_request: "ScanRequest"):
+        single_scan = Scan(scan_request.scan_path, scan_request.output_file)
         log.info(f"Scan with uuid {single_scan.uuid}: Scanning dir {single_scan.base}.")
         await self.scan_base(single_scan)
-        return single_scan.output_file
+        return single_scan.uuid
 
-    def write_to_json(self, json_file: str, codebase: Codebase) -> None:
+    def write_to_json(self, json_file: Path, codebase: Codebase) -> None:
         plugin = JsonPrettyOutput()
-        runner = timings(partial(plugin.process_codebase, output_json_pp=json_file, info=True, codebase=codebase))
+        runner = timings(partial(plugin.process_codebase, output_json_pp=str(json_file), info=True, codebase=codebase))
         self.thread_executor.submit(runner)
 
     async def scan_base(self, single_scan: Scan):
         start = time.perf_counter()
         codebase = await self.create_codebase(single_scan.base)
-        scan_output = await self.scan_files(single_scan, codebase)
-        self.write_to_json(scan_output.output_file, codebase)
-        log.warning(f"Scan with uuid {scan_output.uuid} has total scan time: {time.perf_counter() - start}")
-        return scan_output
+        await self.scan_files(single_scan, codebase)
+        self.write_to_json(single_scan.output_file, codebase)
+        log.warning(f"Scan with uuid {single_scan.uuid} has total scan time: {time.perf_counter() - start}")
+        return single_scan
 
     @timings
     async def create_codebase(self, base):
@@ -193,10 +193,22 @@ app = FastAPI(lifespan=lifespan)
 scan = AsynchronousScan()
 
 
-@app.get("/scan/{file_path:path}")
-async def scan_file(file_path: str, background_tasks: BackgroundTasks):
-    background_tasks.add_task(scan.execute, file_path)
-    return file_path
+class ScanRequest(BaseModel):
+    scan_path: Path
+    output_file: Path
+
+
+@app.get("/scan/")
+async def status():
+    return {"status": "active"}
+
+
+@app.post("/scan/")
+async def scan_file(scan_request: ScanRequest) -> Any:
+    uuid = await scan.execute(scan_request)
+    scan_request_dict = scan_request.dict()
+    scan_request_dict.update({"uuid": uuid})
+    return scan_request_dict
 
 
 def default_log_config():

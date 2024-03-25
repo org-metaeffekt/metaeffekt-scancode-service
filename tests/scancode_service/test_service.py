@@ -1,3 +1,4 @@
+import asyncio
 import dataclasses
 import logging
 import multiprocessing as mp
@@ -5,11 +6,11 @@ import time
 
 import pytest
 from cluecode.plugin_copyright import CopyrightScanner
-from scancode_extensions.resource import ScancodeCodebase as Codebase
 from licensedcode.plugin_license import LicenseScanner
 from scancode.plugin_info import InfoScanner
 
-from scancode_extensions.service import AsynchronousScan
+from scancode_extensions.resource import ScancodeCodebase as Codebase
+from scancode_extensions.service import AsynchronousScan, ScanRequest
 from scancode_extensions.utils import timings
 
 log = logging.getLogger("scancodeservice-test")
@@ -47,19 +48,20 @@ def populated_cache():
 
 
 @pytest.mark.asyncio
-async def test_scanner_async(scan, populated_cache):
-    # asyncio.get_event_loop().set_debug(True)
-    # base = "/home/kai/netty_intermediate/[netty-all]"
-    base = "/home/kai/projekte/metaeffekt/scancode-toolkit/samples"
-    # base ="/home/kai/netty_intermediate"
-    file = await scan.execute(base)
-    assert "/tmp" in file
+async def test_scanner_async(scan, populated_cache, samples_folder):
+    await scan.execute(ScanRequest(scan_path=(samples_folder), output_file="/dev/null"))
+
+    assert len(scan.tasks) == 1
+    task = scan.tasks[0]
+    await asyncio.gather(*scan.tasks)
+    assert task.done()
 
 
 @pytest.mark.asyncio
 async def test_scanner_async_with_many_small_files(scan, populated_cache, fifty_folders_each_contains_single_file):
-    file = await scan.execute(fifty_folders_each_contains_single_file)
-    assert "/tmp" in file
+    await scan.execute(ScanRequest(scan_path=str(fifty_folders_each_contains_single_file), output_file="/dev/null"))
+
+    await asyncio.gather(*scan.tasks)
 
 
 @pytest.fixture(scope="class")
@@ -75,9 +77,9 @@ def plugins():
 
 
 @timings
-def test_os_walk():
+def test_os_walk(samples_folder):
     import os
-    for root, dirs, files in os.walk("/home/kai/projekte/metaeffekt/scancode-toolkit/samples/", topdown=False):
+    for root, dirs, files in os.walk(samples_folder, topdown=False):
         for name in files:
             print(os.path.join(root, name))
 

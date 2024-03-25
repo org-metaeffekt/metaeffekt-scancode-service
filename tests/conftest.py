@@ -17,9 +17,9 @@ def scan():
 
 
 @pytest.fixture(scope="class")
-def codebase(scan) -> Codebase:
+def codebase(scan, samples_folder) -> Codebase:
     return Codebase(
-        "/home/kai/projekte/metaeffekt/scancode-toolkit/samples/",
+        samples_folder,
         codebase_attributes=scan.codebase_attributes,
         resource_attributes=scan.resource_attributes,
     )
@@ -60,11 +60,14 @@ def sample_codebase(samples_folder):
     return codebase
 
 
-@pytest.fixture
+@pytest.fixture(scope="session")
 def samples_folder(toolkit_base):
     return Path(toolkit_base, "samples")
 
 
-@pytest.fixture()
+@pytest.fixture(scope="session")
 def toolkit_base(request: FixtureRequest):
-    return os.path.join(request.config.rootpath, "../scancode-toolkit")
+    toolkit_base = os.path.join(request.config.rootpath, "../scancode-toolkit")
+    if not os.path.exists(toolkit_base):
+        raise FileNotFoundError("ScanCode Toolkit is not a sibling of project directory.")
+    return toolkit_base
