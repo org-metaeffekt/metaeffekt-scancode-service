@@ -15,14 +15,14 @@ from threading import Thread
 import click
 import uvicorn
 from cluecode.plugin_copyright import CopyrightScanner
-from scancode_extensions.resource import ScancodeCodebase as Codebase
 from fastapi import FastAPI, BackgroundTasks
 from formattedcode.output_json import JsonPrettyOutput
 from licensedcode.plugin_license import LicenseScanner
 from scancode.api import get_licenses, get_file_info
-from scancode_extensions.allrights_plugin import allrights_scanner
 from scancode.plugin_info import InfoScanner
 
+from scancode_extensions.allrights_plugin import allrights_scanner
+from scancode_extensions.resource import ScancodeCodebase as Codebase
 from scancode_extensions.utils import compute_scanroot_relative, timings
 
 log = logging.getLogger("scanservice")
@@ -159,6 +159,7 @@ class MergeThread(Thread):
         asyncio.set_event_loop(self.loop)
         self.loop.run_forever()
         self.loop.run_until_complete(asyncio.sleep(0))
+        self.loop.close()
 
     async def internal_stop(self):
         self.loop.stop()
