@@ -91,11 +91,14 @@ class AsynchronousScan:
     async def execute(self, scan_request: "ScanRequest"):
         single_scan = Scan(scan_request.scan_path, scan_request.output_file)
         log.info(f"Scan with uuid {single_scan.uuid}: Scanning dir {single_scan.base}.")
+        await self.schedule_scan(single_scan)
+        return single_scan.uuid
+
+    async def schedule_scan(self, single_scan):
         future = asyncio.create_task(self.scan_base(single_scan), name=str(single_scan.uuid))
         future.add_done_callback(self.tasks.discard)
         future.uuid = str(single_scan.uuid)
         self.tasks.add(future)
-        return single_scan.uuid
 
     def write_to_json(self, json_file: Path, codebase: Codebase) -> None:
         plugin = JsonPrettyOutput()
