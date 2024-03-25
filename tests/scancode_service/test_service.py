@@ -2,6 +2,7 @@ import asyncio
 import dataclasses
 import logging
 import time
+from asyncio import BaseEventLoop
 
 import pytest
 import pytest_asyncio
@@ -9,6 +10,7 @@ from cluecode.plugin_copyright import CopyrightScanner
 from licensedcode.plugin_license import LicenseScanner
 from scancode.plugin_info import InfoScanner
 
+from scancode_extensions import service
 from scancode_extensions import resource
 from scancode_extensions.resource import ScancodeCodebase as Codebase
 from scancode_extensions.service import ScanRequest, AsynchronousScan, Scan
@@ -40,19 +42,19 @@ def populated_cache():
 
 @pytest.mark.asyncio
 async def test_scanner_async(scan, populated_cache, samples_folder):
-    await scan.execute(ScanRequest(scan_path=(samples_folder), output_file="/dev/null"))
+    await service.execute(ScanRequest(scan_path=(samples_folder), output_file="/dev/null"))
 
-    assert len(scan.tasks) == 1
-    task = list(scan.tasks)[0]
-    await asyncio.gather(*scan.tasks)
+    assert len(service.tasks) == 1
+    task = list(service.tasks)[0]
+    await asyncio.gather(*service.tasks)
     assert task.done()
 
 
 @pytest.mark.asyncio
 async def test_scanner_async_with_many_small_files(scan, populated_cache, fifty_folders_each_contains_single_file):
-    await scan.execute(ScanRequest(scan_path=str(fifty_folders_each_contains_single_file), output_file="/dev/null"))
+    await service.execute(ScanRequest(scan_path=str(fifty_folders_each_contains_single_file), output_file="/dev/null"))
 
-    await asyncio.gather(*scan.tasks)
+    await asyncio.gather(*service.tasks)
 
 
 class ErroneousScan:
@@ -69,18 +71,16 @@ class ErroneousScan:
 
 
 @pytest.mark.asyncio
-async def test_erroneous_task_stops_execution(scan_with_error, samples_folder, event_loop):
-    event_loop.set_debug(True)
-    scan, task = scan_with_error
+async def test_erroneous_task_stops_execution(scan_with_error, samples_folder, codebase, event_loop: BaseEventLoop):
+    scan, erroneous_task = scan_with_error
     to_schedule = Scan(samples_folder, "/dev/null")
-    await scan.schedule_scan(to_schedule)
 
-    assert len(scan.tasks) == 1
+    coro = scan.scan_files(to_schedule, codebase)
+    future = event_loop.create_task(coro)
 
-    task.throw_error()
+    erroneous_task.throw_error()
     with pytest.raises(RuntimeError):
-        await asyncio.gather(*scan.tasks)
-
+        await future
 
 @pytest_asyncio.fixture
 async def scan_with_error() -> (AsynchronousScan, ErroneousScan):

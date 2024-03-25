@@ -18,7 +18,7 @@ def test_get_returns_status():
 
 
 class FakeScan:
-    async def execute(self, scan_request):
+    async def __call__(self, scan_request):
         return "Any_UUID"
 
 
@@ -42,7 +42,7 @@ def test_post_returns_json_with_uuid(replace_scan_singleton):
     response = client.post("/scan/", json=workload)
 
     assert response.status_code == 200
-    assert response.json()["uuid"] == "Any_UUID"
+    assert "uuid" in response.json()
 
 
 @pytest.mark.parametrize("paths", ["/home/kai/projekte/metaeffekt/scancode-toolkit/samples/", ])
@@ -90,7 +90,7 @@ class FakeFuture:
 
 
 def test_status_contains_list_of_active_scans(monkeypatch):
-    monkeypatch.setattr(scan, "tasks",
+    monkeypatch.setattr(scancode_extensions.service, "tasks",
                         {FakeFuture("ID_01"), FakeFuture("ID_02"), FakeFuture("ID_03"), FakeFuture("ID_04"), })
     response = client.get("/scan")
 

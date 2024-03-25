@@ -56,7 +56,6 @@ class ScanEvent:
 class AsynchronousScan:
 
     def __init__(self, scanners: list[Callable] = None):
-        self.tasks = set()
         number_processes = 12
         self.executor = ProcessPoolExecutor(number_processes)
         self.thread_executor = ThreadPoolExecutor(2)
@@ -69,28 +68,12 @@ class AsynchronousScan:
         log.error("Shutdown executor.")
         self.executor.shutdown(cancel_futures=True)
 
-    async def execute(self, scan_request: "ScanRequest"):
-        single_scan = Scan(scan_request.scan_path, scan_request.output_file)
-        log.info(f"Scan with uuid {single_scan.uuid}: Scanning dir {single_scan.base}.")
-        await self.schedule_scan(single_scan)
-        return single_scan.uuid
-
-    async def schedule_scan(self, single_scan):
-        uuid = str(single_scan.uuid)
-        coro = self.scan_base(single_scan)
-        await self.schedule_task(coro, uuid)
-
-    async def schedule_task(self, coro, name):
-        future = asyncio.create_task(coro, name=name)
-        future.add_done_callback(self.tasks.discard)
-        self.tasks.add(future)
-
     def write_json(self, json_file: Path, codebase: Codebase) -> None:
         plugin = JsonPrettyOutput()
         runner = timings(partial(plugin.process_codebase, output_json_pp=str(json_file), info=True, codebase=codebase))
         self.thread_executor.submit(runner)
 
-    async def scan_base(self, single_scan: Scan) -> None:
+    async def __call__(self, single_scan: Scan) -> None:
         start = time.perf_counter()
         codebase = await resource.create_codebase(single_scan.base)
         await self.scan_files(single_scan, codebase)
@@ -179,8 +162,31 @@ async def lifespan(app: FastAPI):
     scan.shutdown()
 
 
+tasks = set()
+
 app = FastAPI(lifespan=lifespan)
 scan = AsynchronousScan()
+
+
+async def execute(scan_request: "ScanRequest"):
+    single_scan = Scan(scan_request.scan_path, scan_request.output_file)
+    log.info(f"Scan with uuid {single_scan.uuid}: Scanning dir {single_scan.base}.")
+    await schedule_scan(single_scan)
+    return single_scan.uuid
+
+
+async def schedule_scan(single_scan, default_scan=None):
+    if not default_scan:
+        default_scan = scan
+    coro = default_scan(single_scan)
+    name = str(single_scan.uuid)
+    await schedule_task(coro, name)
+
+
+async def schedule_task(coro, name):
+    future = asyncio.create_task(coro, name=name)
+    future.add_done_callback(tasks.discard)
+    tasks.add(future)
 
 
 class ScanRequest(BaseModel):
@@ -190,13 +196,13 @@ class ScanRequest(BaseModel):
 
 @app.get("/scan")
 async def status():
-    scans = [task.get_name() for task in scan.tasks]
+    scans = [task.get_name() for task in tasks]
     return {"status": "active", "scans": scans}
 
 
 @app.post("/scan/")
 async def scan_file(scan_request: ScanRequest) -> Any:
-    uuid = await scan.execute(scan_request)
+    uuid = await execute(scan_request)
     scan_request_dict = scan_request.dict()
     scan_request_dict.update({"uuid": uuid})
     return scan_request_dict
