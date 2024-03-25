@@ -1,4 +1,0 @@
-WARNING  scancode_cache:cache.py:421 Cache not initialized yet.
-WARNING  scancode_cache:cache.py:109 Loading cache file.
-WARNING  scanservice:service.py:86 PIDs of ProcessPoolExecutor: {}
-WARNING  scanservice:service.py:102 Scan with uuid 68d5714d-a71d-4546-a0c0-9b8260355d6a has total scan time: 4.5494141390008735
