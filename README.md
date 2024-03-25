@@ -41,3 +41,15 @@ Scan requests can be initiated by a post request to [http://localhost:8000/scan]
 status
 of the service and an overview over the current scans send a get request
 to [http://localhost:8000/scan](http://localhost:8000/scan).
+
+## Development
+
+### Using tox
+
+One can start the service from the root directory by using
+
+```bash
+tox -e start
+```
+
+This starts scancode-service with its default parameters.
