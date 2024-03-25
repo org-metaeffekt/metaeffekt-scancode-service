@@ -2,7 +2,7 @@ import pytest
 import pytest_asyncio
 from scancode.cli import ScancodeCodebase as Codebase
 
-from scancode_service import MergeThread, AsynchronousScan
+from scancode_extensions.service import MergeThread
 
 
 @pytest.mark.skip

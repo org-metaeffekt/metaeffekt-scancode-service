@@ -22,7 +22,7 @@ from licensedcode.plugin_license import LicenseScanner
 from scancode.api import get_licenses, get_copyrights, get_file_info
 from scancode.plugin_info import InfoScanner
 
-from utils import compute_scanroot_relative, timings
+from scancode_extensions.utils import compute_scanroot_relative, timings
 
 log = logging.getLogger("scanservice")
 
@@ -61,7 +61,7 @@ class AsynchronousScan:
         self.executor = ProcessPoolExecutor(number_processes)
         self.thread_executor = ThreadPoolExecutor(2)
 
-        self.scanners = [get_file_info, get_licenses, get_copyrights]
+        self.scanners = [get_file_info, get_licenses, allrights_scanner]
         self.plugins = {
             "info": InfoScanner,
             "copyright": CopyrightScanner,
@@ -204,7 +204,7 @@ async def scan_file(file_path: str, background_tasks: BackgroundTasks):
 @click.option('--port', default=8000, help="Port to accept connections.")
 @click.option('--output_dir', help="Where to write output files.")
 def start(log_config, workers, port, output_dir):
-    uvicorn.run("scancode_service:app", host="0.0.0.0", port=port, workers=workers, log_config=log_config)
+    uvicorn.run("scancode_extensions.service:app", host="0.0.0.0", port=port, workers=workers, log_config=log_config)
 
 
 if __name__ == "__main__":

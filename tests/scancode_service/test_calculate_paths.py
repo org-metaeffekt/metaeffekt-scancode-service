@@ -1,6 +1,6 @@
 from pathlib import Path
 
-from utils import compute_scanroot_relative
+from scancode_extensions.utils import compute_scanroot_relative
 
 
 def test_calculate():

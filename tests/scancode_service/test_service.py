@@ -1,7 +1,6 @@
 import dataclasses
 import logging
 import multiprocessing as mp
-import os
 import time
 
 import pytest
@@ -10,8 +9,8 @@ from scancode.cli import ScancodeCodebase as Codebase
 from licensedcode.plugin_license import LicenseScanner
 from scancode.plugin_info import InfoScanner
 
-from scancode_service import AsynchronousScan
-from utils import timings
+from scancode_extensions.service import AsynchronousScan
+from scancode_extensions.utils import timings
 
 log = logging.getLogger("scancodeservice-test")
 

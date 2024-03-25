@@ -8,7 +8,7 @@ from scancode.cli import ScancodeCodebase as Codebase
 from faker_file.providers.txt_file import TxtFileProvider
 from faker_file.storages.filesystem import FileSystemStorage
 
-from scancode_service import AsynchronousScan
+from scancode_extensions.service import AsynchronousScan
 
 
 @pytest.fixture(scope="class")

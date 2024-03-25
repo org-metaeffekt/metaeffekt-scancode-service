@@ -3,7 +3,7 @@ from typing import Any
 import pytest
 from cluecode.plugin_copyright import CopyrightScanner
 
-from scancode_service import AsynchronousScan
+from scancode_extensions.service import AsynchronousScan
 
 
 class ResourceMappingRunner:

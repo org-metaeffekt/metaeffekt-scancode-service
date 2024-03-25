@@ -1,5 +1,5 @@
 from fastapi.testclient import TestClient
-from scancode_service import app
+from scancode_extensions.service import app
 
 client = TestClient(app)
 
