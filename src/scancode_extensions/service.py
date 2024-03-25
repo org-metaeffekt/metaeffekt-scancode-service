@@ -56,6 +56,7 @@ class ScanEvent:
 
 
 class AsynchronousScan:
+
     def __init__(self):
         self.tasks = []
         number_processes = 12
@@ -68,6 +69,10 @@ class AsynchronousScan:
             "copyright": CopyrightScanner,
             "license": LicenseScanner,
         }
+
+    def shutdown(self):
+        log.error("Shutdown executor.")
+        self.executor.shutdown(cancel_futures=True)
 
     @property
     def resource_attributes(self):
@@ -191,7 +196,7 @@ async def lifespan(app: FastAPI):
     populate_cache()
     log.info(f"Cache initialized. Time elapsed: {time.perf_counter() - start}")
     yield
-
+    scan.shutdown()
 
 app = FastAPI(lifespan=lifespan)
 scan = AsynchronousScan()
@@ -227,7 +232,8 @@ def default_log_config():
 @click.option('--port', default=8000, help="Port to accept connections.")
 @click.option('--output_dir', help="Where to write output files.")
 def start(log_config, workers, port, output_dir):
-    uvicorn.run("scancode_extensions.service:app", host="0.0.0.0", port=port, workers=workers, log_config=log_config)
+    uvicorn.run("scancode_extensions.service:app", host="0.0.0.0", port=port, workers=workers, log_config=log_config,
+                timeout_graceful_shutdown=5)
 
 
 if __name__ == "__main__":
