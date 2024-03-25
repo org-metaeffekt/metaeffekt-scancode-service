@@ -14,6 +14,5 @@ dependencies = [
 [project.scripts]
 scancode-service = "scancode_extensions.service:start"
 
-[tool.pytest.ini_options]
-log_file = "timing.log"
-log_file_level = "WARN"
+[tool.setuptools.package-data]
+"scancode_extensions.resources" = ["*.yaml"]

@@ -199,9 +199,14 @@ async def scan_file(file_path: str, background_tasks: BackgroundTasks):
     return file_path
 
 
+def default_log_config():
+    from importlib.resources import files
+    return files('scancode_extensions.resources').joinpath('log_config.yaml')
+
+
 @click.command()
 @click.option('--workers', default=1, help="Number of parallel workers.")
-@click.option('--log-config', default="log_config.yaml", help="Configuration file for logging.")
+@click.option('--log-config', default=default_log_config(), help="Configuration file for logging.")
 @click.option('--port', default=8000, help="Port to accept connections.")
 @click.option('--output_dir', help="Where to write output files.")
 def start(log_config, workers, port, output_dir):
