@@ -10,10 +10,10 @@ from cluecode.plugin_copyright import CopyrightScanner
 from licensedcode.plugin_license import LicenseScanner
 from scancode.plugin_info import InfoScanner
 
-from scancode_extensions import service
 from scancode_extensions import resource
+from scancode_extensions import service
 from scancode_extensions.resource import ScancodeCodebase as Codebase
-from scancode_extensions.service import ScanRequest, AsynchronousScan, Scan
+from scancode_extensions.service import AsynchronousScan, ScanRequest, Scan
 from scancode_extensions.utils import timings
 
 log = logging.getLogger("scancodeservice-test")
@@ -132,3 +132,23 @@ def test_build_codebase(samples_folder):
                              full_root=False, max_depth=0, )
 
     assert codebase.compute_counts() == (33, 11, 0)
+
+
+async def fake_scan(self, *args, **kwargs):
+    await asyncio.sleep(5)
+
+
+@pytest.mark.asyncio
+async def test_read_status_of_scheduled_task():
+    single_scan = Scan("/any/path", "any_output.json")
+    await service.schedule_scan(single_scan, default_scan=fake_scan)
+
+    assert service.get_task_status(single_scan.uuid) == dict(uuid=str(single_scan.uuid), status="pending")
+
+    await list(service.tasks)[0]
+
+    assert service.get_task_status(single_scan.uuid) == dict(uuid=str(single_scan.uuid), status="done")
+    await asyncio.sleep(5)
+    assert len(service.tasks) == 0
+    with pytest.raises(KeyError):
+        service.get_task_status(single_scan.uuid)

@@ -184,8 +184,15 @@ async def schedule_scan(single_scan, default_scan=None):
 
 
 async def schedule_task(coro, name):
+    def discard(fut):
+        async def coro():
+            asyncio.sleep(30)
+            tasks.discard(fut)
+
+        asyncio.create_task(coro())
+
     future = asyncio.create_task(coro, name=name)
-    future.add_done_callback(tasks.discard)
+    future.add_done_callback(discard)
     tasks.add(future)
 
 
@@ -198,6 +205,19 @@ class ScanRequest(BaseModel):
 async def status():
     scans = [task.get_name() for task in tasks]
     return {"status": "active", "scans": scans}
+
+
+def get_task_status(uuid):
+    uuid = str(uuid)
+    task_dict = {task.get_name(): task for task in tasks}
+    task = task_dict[uuid]
+    return dict(uuid=uuid, status="done" if task.done() else "pending")
+
+
+@app.get("/scan/{uuid}")
+async def status(uuid: str):
+    status_dict = get_task_status(uuid)
+    return status_dict
 
 
 @app.post("/scan/")
