@@ -64,11 +64,7 @@ class AsynchronousScan:
         self.thread_executor = ThreadPoolExecutor(2)
 
         self.scanners = [get_file_info, get_licenses, allrights_scanner]
-        self.plugins = {
-            "info": InfoScanner,
-            "copyright": CopyrightScanner,
-            "license": LicenseScanner,
-        }
+        self.plugins = [InfoScanner, CopyrightScanner, LicenseScanner, ]
 
     def shutdown(self):
         log.error("Shutdown executor.")
@@ -77,14 +73,14 @@ class AsynchronousScan:
     @property
     def resource_attributes(self):
         attributes = {}
-        for plugin in self.plugins.values():
+        for plugin in self.plugins:
             attributes.update(plugin.resource_attributes)
         return attributes
 
     @property
     def codebase_attributes(self):
         attributes = {}
-        for plugin in self.plugins.values():
+        for plugin in self.plugins:
             attributes.update(plugin.codebase_attributes)
         return attributes
 
