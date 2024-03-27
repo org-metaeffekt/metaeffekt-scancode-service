@@ -85,6 +85,9 @@ def test_multi_post_subfolder_scan(tmp_path, root, faker):
 class FakeFuture:
     uuid: str
 
+    def get_name(self):
+        return self.uuid
+
 
 def test_status_contains_list_of_active_scans(monkeypatch):
     monkeypatch.setattr(scan, "tasks",

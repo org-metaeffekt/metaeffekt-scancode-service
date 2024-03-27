@@ -74,9 +74,9 @@ class AsynchronousScan:
         return single_scan.uuid
 
     async def schedule_scan(self, single_scan):
-        future = asyncio.create_task(self.scan_base(single_scan), name=str(single_scan.uuid))
+        uuid = str(single_scan.uuid)
+        future = asyncio.create_task(self.scan_base(single_scan), name=uuid)
         future.add_done_callback(self.tasks.discard)
-        future.uuid = str(single_scan.uuid)
         self.tasks.add(future)
 
     def write_to_json(self, json_file: Path, codebase: Codebase) -> None:
@@ -84,15 +84,14 @@ class AsynchronousScan:
         runner = timings(partial(plugin.process_codebase, output_json_pp=str(json_file), info=True, codebase=codebase))
         self.thread_executor.submit(runner)
 
-    async def scan_base(self, single_scan: Scan):
+    async def scan_base(self, single_scan: Scan) -> None:
         start = time.perf_counter()
         codebase = await resource.create_codebase(single_scan.base)
         await self.scan_files(single_scan, codebase)
         self.write_to_json(single_scan.output_file, codebase)
         log.warning(f"Scan with uuid {single_scan.uuid} has total scan time: {time.perf_counter() - start}")
-        return single_scan
 
-    async def scan_files(self, single_scan: Scan, codebase: Codebase) -> Scan:
+    async def scan_files(self, single_scan: Scan, codebase: Codebase) -> None:
         async with MergeThread(codebase) as codebase:
             tasks = []
             async for single_file in single_scan.create_events():
@@ -100,14 +99,12 @@ class AsynchronousScan:
                     self.scan_file(single_file, codebase.merge_result_for_resource)
                 )
             await asyncio.gather(*tasks)
-        return single_scan
 
     async def scan_file(self, single_file: ScanEvent, merge_func):
-        assert single_file
+        log.debug(f"File {single_file.relative_path} scan {single_file.uuid} requested for.")
 
         loop = asyncio.get_event_loop()
         tasks = []
-        log.debug(f"File {single_file.relative_path} scan {single_file.uuid} requested for.")
         for _scan in self.scanners:
             task = loop.run_in_executor(self.executor, _scan, single_file.location)
             tasks.append(task)
@@ -187,7 +184,7 @@ class ScanRequest(BaseModel):
 
 @app.get("/scan")
 async def status():
-    scans = [task.uuid for task in scan.tasks]
+    scans = [task.get_name() for task in scan.tasks]
     return {"status": "active", "scans": scans}
 
 
