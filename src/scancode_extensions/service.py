@@ -16,14 +16,12 @@ from typing import Any
 
 import click
 import uvicorn
-from cluecode.plugin_copyright import CopyrightScanner
 from fastapi import FastAPI
 from formattedcode.output_json import JsonPrettyOutput
-from licensedcode.plugin_license import LicenseScanner
 from pydantic import BaseModel
 from scancode.api import get_licenses, get_file_info
-from scancode.plugin_info import InfoScanner
 
+from scancode_extensions import resource
 from scancode_extensions.allrights_plugin import allrights_scanner
 from scancode_extensions.resource import ScancodeCodebase as Codebase
 from scancode_extensions.utils import compute_scanroot_relative, timings
@@ -64,25 +62,10 @@ class AsynchronousScan:
         self.thread_executor = ThreadPoolExecutor(2)
 
         self.scanners = [get_file_info, get_licenses, allrights_scanner]
-        self.plugins = [InfoScanner, CopyrightScanner, LicenseScanner, ]
 
     def shutdown(self):
         log.error("Shutdown executor.")
         self.executor.shutdown(cancel_futures=True)
-
-    @property
-    def resource_attributes(self):
-        attributes = {}
-        for plugin in self.plugins:
-            attributes.update(plugin.resource_attributes)
-        return attributes
-
-    @property
-    def codebase_attributes(self):
-        attributes = {}
-        for plugin in self.plugins:
-            attributes.update(plugin.codebase_attributes)
-        return attributes
 
     async def execute(self, scan_request: "ScanRequest"):
         single_scan = Scan(scan_request.scan_path, scan_request.output_file)
@@ -103,16 +86,11 @@ class AsynchronousScan:
 
     async def scan_base(self, single_scan: Scan):
         start = time.perf_counter()
-        codebase = await self.create_codebase(single_scan.base)
+        codebase = await resource.create_codebase(single_scan.base)
         await self.scan_files(single_scan, codebase)
         self.write_to_json(single_scan.output_file, codebase)
         log.warning(f"Scan with uuid {single_scan.uuid} has total scan time: {time.perf_counter() - start}")
         return single_scan
-
-    @timings
-    async def create_codebase(self, base):
-        return Codebase(location=base, codebase_attributes=self.codebase_attributes,
-                        resource_attributes=self.resource_attributes)
 
     async def scan_files(self, single_scan: Scan, codebase: Codebase) -> Scan:
         async with MergeThread(codebase) as codebase:
@@ -196,6 +174,7 @@ async def lifespan(app: FastAPI):
     log.info(f"Cache initialized. Time elapsed: {time.perf_counter() - start}")
     yield
     scan.shutdown()
+
 
 app = FastAPI(lifespan=lifespan)
 scan = AsynchronousScan()

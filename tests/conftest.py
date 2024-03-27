@@ -4,6 +4,8 @@ from pathlib import Path
 
 import pytest
 from _pytest.fixtures import FixtureRequest
+
+from scancode_extensions import resource
 from scancode_extensions.resource import ScancodeCodebase as Codebase
 from faker_file.providers.txt_file import TxtFileProvider
 from faker_file.storages.filesystem import FileSystemStorage
@@ -20,8 +22,8 @@ def scan():
 def codebase(scan, samples_folder) -> Codebase:
     return Codebase(
         samples_folder,
-        codebase_attributes=scan.codebase_attributes,
-        resource_attributes=scan.resource_attributes,
+        codebase_attributes=resource.codebase_attributes(),
+        resource_attributes=resource.resource_attributes(),
     )
 
 

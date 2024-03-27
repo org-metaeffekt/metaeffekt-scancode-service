@@ -1,6 +1,11 @@
 import functools
 
+from cluecode.plugin_copyright import CopyrightScanner
 from commoncode.resource import Codebase
+from licensedcode.plugin_license import LicenseScanner
+from scancode.plugin_info import InfoScanner
+
+from scancode_extensions.utils import timings
 
 
 class ScancodeCodebase(Codebase):
@@ -24,3 +29,26 @@ class ScancodeCodebase(Codebase):
     @functools.cache
     def _load_resource(self, path):
         return super()._load_resource(path)
+
+
+plugins = [InfoScanner, CopyrightScanner, LicenseScanner, ]
+
+
+def resource_attributes():
+    attributes = {}
+    for plugin in plugins:
+        attributes.update(plugin.resource_attributes)
+    return attributes
+
+
+def codebase_attributes():
+    attributes = {}
+    for plugin in plugins:
+        attributes.update(plugin.codebase_attributes)
+    return attributes
+
+
+@timings
+async def create_codebase(base):
+    return ScancodeCodebase(location=base, codebase_attributes=codebase_attributes(),
+                            resource_attributes=resource_attributes())

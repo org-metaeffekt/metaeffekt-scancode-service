@@ -1,5 +1,7 @@
 import pytest
 import pytest_asyncio
+
+from scancode_extensions import resource
 from scancode_extensions.resource import ScancodeCodebase as Codebase
 
 from scancode_extensions.service import MergeThread
@@ -58,4 +60,4 @@ async def thread(codebase: Codebase):
 
 @pytest_asyncio.fixture()
 async def codebase(samples_folder, scan):
-    return Codebase(samples_folder, scan.codebase_attributes, scan.resource_attributes)
+    return Codebase(samples_folder, resource.codebase_attributes(), resource.resource_attributes())

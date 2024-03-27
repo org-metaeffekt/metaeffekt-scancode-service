@@ -1,7 +1,6 @@
 import asyncio
 import dataclasses
 import logging
-import multiprocessing as mp
 import time
 
 import pytest
@@ -9,8 +8,9 @@ from cluecode.plugin_copyright import CopyrightScanner
 from licensedcode.plugin_license import LicenseScanner
 from scancode.plugin_info import InfoScanner
 
+from scancode_extensions import resource
 from scancode_extensions.resource import ScancodeCodebase as Codebase
-from scancode_extensions.service import AsynchronousScan, ScanRequest
+from scancode_extensions.service import ScanRequest
 from scancode_extensions.utils import timings
 
 log = logging.getLogger("scancodeservice-test")
@@ -81,17 +81,17 @@ def test_codebase(sample_codebase):
 
 
 @timings
-def init_codebase(scan: AsynchronousScan, base, *args, **kwargs):
+def init_codebase(base, *args, **kwargs):
     log.info("Initialize codebase.")
-    codebase = Codebase(base, codebase_attributes=scan.codebase_attributes,
-                        resource_attributes=scan.resource_attributes, *args, **kwargs)
+    codebase = Codebase(base, codebase_attributes=resource.codebase_attributes(),
+                        resource_attributes=resource.resource_attributes(), *args, **kwargs)
     codebase.get_or_create_current_header()
     log.info("Initialization completed.")
     return codebase
 
 
-def test_build_codebase(scan, samples_folder):
-    codebase = init_codebase(scan, samples_folder,
+def test_build_codebase(samples_folder):
+    codebase = init_codebase(samples_folder,
                              max_in_memory=10000, strip_root=False,
                              full_root=False, max_depth=0, )
 
