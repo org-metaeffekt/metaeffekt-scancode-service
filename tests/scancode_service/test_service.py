@@ -4,13 +4,14 @@ import logging
 import time
 
 import pytest
+import pytest_asyncio
 from cluecode.plugin_copyright import CopyrightScanner
 from licensedcode.plugin_license import LicenseScanner
 from scancode.plugin_info import InfoScanner
 
 from scancode_extensions import resource
 from scancode_extensions.resource import ScancodeCodebase as Codebase
-from scancode_extensions.service import ScanRequest
+from scancode_extensions.service import ScanRequest, AsynchronousScan, Scan
 from scancode_extensions.utils import timings
 
 log = logging.getLogger("scancodeservice-test")
@@ -54,6 +55,40 @@ async def test_scanner_async_with_many_small_files(scan, populated_cache, fifty_
     await asyncio.gather(*scan.tasks)
 
 
+class ErroneousScan:
+    def __init__(self):
+        self.should_raise = False
+
+    def __call__(self, *args, **kwargs):
+        while True:
+            if self.should_raise:
+                raise RuntimeError
+
+    def throw_error(self):
+        self.should_raise = True
+
+
+@pytest.mark.asyncio
+async def test_erroneous_task_stops_execution(scan_with_error, samples_folder, event_loop):
+    event_loop.set_debug(True)
+    scan, task = scan_with_error
+    to_schedule = Scan(samples_folder, "/dev/null")
+    await scan.schedule_scan(to_schedule)
+
+    assert len(scan.tasks) == 1
+
+    task.throw_error()
+    with pytest.raises(RuntimeError):
+        await asyncio.gather(*scan.tasks)
+
+
+@pytest_asyncio.fixture
+async def scan_with_error() -> (AsynchronousScan, ErroneousScan):
+    erroneous_scan = ErroneousScan()
+    scan = AsynchronousScan(scanners=[erroneous_scan])
+    return scan, erroneous_scan
+
+
 @pytest.fixture(scope="class")
 def plugins():
     """These are the plugins we need to get the desired output. Mostly equal to calling 'scancode -cli' on
@@ -78,7 +113,7 @@ def test_get_resource_from_codebase(sample_codebase):
     existing_path = "samples/JGroups/licenses/bouncycastle.txt"
     assert sample_codebase.get_resource(existing_path)
     non_existing_path = "xxx/this/path/is/not/existing"
-    assert sample_codebase.get_resource(non_existing_path)
+    assert not sample_codebase.get_resource(non_existing_path)
 
 
 @timings
