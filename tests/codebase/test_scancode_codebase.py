@@ -1,6 +1,7 @@
 import tempfile
 
 from formattedcode.output_json import write_results
+
 from scancode_extensions.resource import ScancodeCodebase
 
 

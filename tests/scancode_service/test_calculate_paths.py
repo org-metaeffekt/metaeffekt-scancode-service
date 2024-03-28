@@ -1,5 +1,6 @@
 from pathlib import Path
 
+from scancode_extensions.service import Scan
 from scancode_extensions.utils import compute_scanroot_relative
 
 
@@ -19,3 +20,11 @@ def test_generate_scancode_relative():
     assert relative == "netty_intermediate/[netty-all]/[netty-all-4.1.68.Final.jar-3ae6177fe4f5fd30fee41997cb93fef0]-intermediate/META-INF/MANIFEST.MF/segment-0.txt"
 
 
+def test_init_scan():
+    base = Path("/any/path")
+    output_file = Path("/another/path/result.json")
+
+    out = Scan(base, output_file)
+
+    assert out.base == Path("/any/path")
+    assert out.output_file == Path("/another/path/result.json")

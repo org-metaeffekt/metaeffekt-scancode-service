@@ -5,10 +5,10 @@ import pytest
 from commoncode.resource import Codebase
 from formattedcode.output_json import JsonPrettyOutput
 from licensedcode.plugin_license import LicenseScanner
-from scancode_extensions.resource import ScancodeCodebase
 from scancode.plugin_info import InfoScanner
 
 from scancode_extensions.allrights_plugin import AllrightsCopyrightScanner
+from scancode_extensions.resource import ScancodeCodebase
 
 
 @dataclass

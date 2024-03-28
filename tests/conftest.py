@@ -4,12 +4,11 @@ from pathlib import Path
 
 import pytest
 from _pytest.fixtures import FixtureRequest
-
-from scancode_extensions import resource
-from scancode_extensions.resource import ScancodeCodebase as Codebase
 from faker_file.providers.txt_file import TxtFileProvider
 from faker_file.storages.filesystem import FileSystemStorage
 
+from scancode_extensions import resource
+from scancode_extensions.resource import ScancodeCodebase as Codebase
 from scancode_extensions.service import AsynchronousScan
 
 
@@ -58,7 +57,8 @@ def fifty_folders_each_contains_single_file(faker, add_providers, tmp_path):
 
 @pytest.fixture
 def sample_codebase(samples_folder):
-    codebase = Codebase(samples_folder, with_info=True)
+    codebase = Codebase(samples_folder, resource_attributes=resource.resource_attributes(),
+                        codebase_attributes=resource.codebase_attributes(), with_info=True)
     return codebase
 
 

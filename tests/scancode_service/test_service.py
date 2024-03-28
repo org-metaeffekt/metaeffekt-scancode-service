@@ -74,10 +74,11 @@ def test_os_walk(samples_folder):
             print(os.path.join(root, name))
 
 
-def test_codebase(sample_codebase):
-    relpath = "samples/JGroups/licenses/bouncycastle.txt"
-    resource = sample_codebase.get_resource(relpath)
-    assert resource
+def test_get_resource_from_codebase(sample_codebase):
+    existing_path = "samples/JGroups/licenses/bouncycastle.txt"
+    assert sample_codebase.get_resource(existing_path)
+    non_existing_path = "xxx/this/path/is/not/existing"
+    assert sample_codebase.get_resource(non_existing_path)
 
 
 @timings
