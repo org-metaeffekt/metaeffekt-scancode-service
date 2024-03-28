@@ -13,7 +13,7 @@ def test_xxx(base: str):
     thread = MergeThread(codebase)
     relative_path: str = "samples/JGroups/LICENSE"
     result: dict = {"license_detections": []}
-    thread.write_result_for_resource(relative_path, result)
+    thread._write(relative_path, result)
 
     resource_dict = codebase.get_resource(relative_path).to_dict(with_info=True)
     assert "license_detections" in resource_dict
@@ -42,7 +42,7 @@ async def test_use_in_context_manager(thread: MergeThread):
 @pytest.mark.asyncio
 async def test_allow_async_merge(thread: MergeThread, codebase: Codebase):
     async with thread as cb:
-        await cb.merge_result_for_resource("samples/JGroups/LICENSE", {"license_detections": []})
+        await cb.write("samples/JGroups/LICENSE", {"license_detections": []})
         resource_dict = thread.codebase.get_resource("samples/JGroups/LICENSE").to_dict(with_info=True)
 
     assert "license_detections" in resource_dict

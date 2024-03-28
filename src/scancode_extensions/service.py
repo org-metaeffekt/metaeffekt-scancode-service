@@ -12,7 +12,7 @@ from dataclasses import field
 from functools import reduce, partial
 from pathlib import Path
 from threading import Thread
-from typing import Any
+from typing import Any, Callable
 
 import click
 import uvicorn
@@ -55,13 +55,15 @@ class ScanEvent:
 
 class AsynchronousScan:
 
-    def __init__(self):
+    def __init__(self, scanners: list[Callable] = None):
         self.tasks = set()
         number_processes = 12
         self.executor = ProcessPoolExecutor(number_processes)
         self.thread_executor = ThreadPoolExecutor(2)
-
-        self.scanners = [get_file_info, get_licenses, allrights_scanner]
+        if not scanners:
+            self.scanners = [get_file_info, get_licenses, allrights_scanner]
+        else:
+            self.scanners = scanners
 
     def shutdown(self):
         log.error("Shutdown executor.")
@@ -75,11 +77,15 @@ class AsynchronousScan:
 
     async def schedule_scan(self, single_scan):
         uuid = str(single_scan.uuid)
-        future = asyncio.create_task(self.scan_base(single_scan), name=uuid)
+        coro = self.scan_base(single_scan)
+        await self.schedule_task(coro, uuid)
+
+    async def schedule_task(self, coro, name):
+        future = asyncio.create_task(coro, name=name)
         future.add_done_callback(self.tasks.discard)
         self.tasks.add(future)
 
-    def write_to_json(self, json_file: Path, codebase: Codebase) -> None:
+    def write_json(self, json_file: Path, codebase: Codebase) -> None:
         plugin = JsonPrettyOutput()
         runner = timings(partial(plugin.process_codebase, output_json_pp=str(json_file), info=True, codebase=codebase))
         self.thread_executor.submit(runner)
@@ -88,7 +94,7 @@ class AsynchronousScan:
         start = time.perf_counter()
         codebase = await resource.create_codebase(single_scan.base)
         await self.scan_files(single_scan, codebase)
-        self.write_to_json(single_scan.output_file, codebase)
+        self.write_json(single_scan.output_file, codebase)
         log.warning(f"Scan with uuid {single_scan.uuid} has total scan time: {time.perf_counter() - start}")
 
     async def scan_files(self, single_scan: Scan, codebase: Codebase) -> None:
@@ -96,11 +102,11 @@ class AsynchronousScan:
             tasks = []
             async for single_file in single_scan.create_events():
                 tasks.append(
-                    self.scan_file(single_file, codebase.merge_result_for_resource)
+                    self.scan_file(single_file, codebase.write)
                 )
             await asyncio.gather(*tasks)
 
-    async def scan_file(self, single_file: ScanEvent, merge_func):
+    async def scan_file(self, single_file: ScanEvent, write):
         log.debug(f"File {single_file.relative_path} scan {single_file.uuid} requested for.")
 
         loop = asyncio.get_event_loop()
@@ -110,7 +116,7 @@ class AsynchronousScan:
             tasks.append(task)
         results = await asyncio.gather(*tasks)
         result = reduce(operator.ior, results, {})
-        await merge_func(single_file.relative_path, result)
+        await write(single_file.relative_path, result)
 
 
 class MergeThread(Thread):
@@ -119,7 +125,7 @@ class MergeThread(Thread):
         self.codebase = codebase
         self.loop = asyncio.new_event_loop()
 
-    async def write_result_for_resource(self, relative_path: str, result: dict):
+    async def _write(self, at: str, result: dict):
         def merge(items, into):
             for k, v in items:
                 if not v:
@@ -127,14 +133,14 @@ class MergeThread(Thread):
                 else:
                     setattr(into, k, v)
 
-        log.debug(f"Merging result for '{relative_path}'")
-        with_resource = self.codebase.get_resource(relative_path)
+        log.debug(f"Merging result for '{at}'")
+        with_resource = self.codebase.get_resource(at)
         merge(result.items(), with_resource)
 
         self.codebase.save_resource(with_resource)
 
-    async def merge_result_for_resource(self, relative_path: str, result: dict):
-        coro = self.write_result_for_resource(relative_path, result)
+    async def write(self, resource_path: str, result: dict):
+        coro = self._write(resource_path, result)
         future = asyncio.run_coroutine_threadsafe(coro, self.loop)
         await asyncio.wrap_future(future)
 
