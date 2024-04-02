@@ -186,7 +186,7 @@ async def schedule_scan(single_scan, default_scan=None):
 async def schedule_task(coro, name):
     def discard(fut):
         async def coro():
-            asyncio.sleep(30)
+            await asyncio.sleep(30)
             tasks.discard(fut)
 
         asyncio.create_task(coro())
