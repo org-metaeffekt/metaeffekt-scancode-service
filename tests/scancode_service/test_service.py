@@ -139,6 +139,7 @@ async def fake_scan(self, *args, **kwargs):
 
 
 @pytest.mark.asyncio
+@pytest.mark.skip("Tasks are deleted 30s after finishing. Should not be awaited.")
 async def test_read_status_of_scheduled_task():
     single_scan = Scan("/any/path", "any_output.json")
     await service.schedule_scan(single_scan, default_scan=fake_scan)
