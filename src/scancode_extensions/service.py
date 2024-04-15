@@ -24,7 +24,8 @@ from scancode.api import get_licenses, get_file_info
 from scancode_extensions import resource
 from scancode_extensions.allrights_plugin import allrights_scanner
 from scancode_extensions.resource import ScancodeCodebase as Codebase
-from scancode_extensions.utils import compute_scanroot_relative, timings
+
+from scancode_extensions.utils import compute_scanroot_relative, timings, make_atomic
 
 log = logging.getLogger("scanservice")
 
@@ -70,7 +71,7 @@ class AsynchronousScan:
 
     def write_json(self, json_file: Path, codebase: Codebase) -> None:
         plugin = JsonPrettyOutput()
-        runner = timings(partial(plugin.process_codebase, output_json_pp=str(json_file), info=True, codebase=codebase))
+        runner = timings(partial(make_atomic(plugin.process_codebase), output_json_pp=str(json_file), info=True, codebase=codebase))
         self.thread_executor.submit(runner)
 
     async def __call__(self, single_scan: Scan) -> None:
