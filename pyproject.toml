@@ -4,15 +4,14 @@ build-backend = "setuptools.build_meta"
 
 [project]
 name = "scancode-service"
-version = "0.1.0"
-dependencies = [
-    "scancode-toolkit==32.0.8",
-    "click==8.1.7",
-    "fastapi[all]==0.110.0"
-]
+version = "0.2.0"
+dynamic=["dependencies"]
 
 [project.scripts]
 scancode-service = "scancode_extensions.service:start"
 
 [tool.setuptools.package-data]
 "scancode_extensions.resources" = ["*.yaml"]
+
+[tool.setuptools.dynamic]
+dependencies = { file = ["requirements.in"] }
