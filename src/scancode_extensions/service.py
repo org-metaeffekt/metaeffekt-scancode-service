@@ -16,6 +16,7 @@ from typing import Any, Callable
 
 import click
 import uvicorn
+from commoncode.timeutils import time2tstamp
 from fastapi import FastAPI
 from formattedcode.output_json import JsonPrettyOutput
 from pydantic import BaseModel
@@ -24,7 +25,6 @@ from scancode.api import get_licenses, get_file_info
 from scancode_extensions import resource
 from scancode_extensions.allrights_plugin import allrights_scanner
 from scancode_extensions.resource import ScancodeCodebase as Codebase
-
 from scancode_extensions.utils import compute_scanroot_relative, timings, make_atomic
 
 log = logging.getLogger("scanservice")
@@ -71,13 +71,18 @@ class AsynchronousScan:
 
     def write_json(self, json_file: Path, codebase: Codebase) -> None:
         plugin = JsonPrettyOutput()
-        runner = timings(partial(make_atomic(plugin.process_codebase), output_json_pp=str(json_file), info=True, codebase=codebase))
+        runner = timings(
+            partial(make_atomic(plugin.process_codebase), output_json_pp=str(json_file), info=True, codebase=codebase))
         self.thread_executor.submit(runner)
 
     async def __call__(self, single_scan: Scan) -> None:
         start = time.perf_counter()
+        start_time = time2tstamp()
         codebase = await resource.create_codebase(single_scan.base)
         await self.scan_files(single_scan, codebase)
+        codebase.update_header(start_timestamp=start_time, end_timestamp=time2tstamp(),
+                               duration=time.perf_counter() - start,
+                               options=dict(base=str(single_scan.base), output_file=str(single_scan.output_file)))
         self.write_json(single_scan.output_file, codebase)
         log.warning(f"Scan with uuid {single_scan.uuid} has total scan time: {time.perf_counter() - start}")
 

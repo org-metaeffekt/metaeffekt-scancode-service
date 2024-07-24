@@ -2,11 +2,15 @@ import asyncio
 import functools
 import logging
 import os
+import platform
+import sys
 import time
 import uuid
 from functools import wraps
 from pathlib import Path
 from typing import Coroutine
+
+import commoncode
 
 log = logging.getLogger("scanservice")
 
@@ -70,3 +74,13 @@ def make_atomic(like_process_codebase, modifier=uuid.uuid4):
         return like_process_codebase(*args, **kwargs)
 
     return wrapper
+
+
+def get_system_environment():
+    return {
+        'operating_system': commoncode.system.current_os,
+        'cpu_architecture': commoncode.system.current_arch,
+        'platform': platform.platform(),
+        'platform_version': platform.version(),
+        'python_version': sys.version
+    }
