@@ -84,7 +84,7 @@ class AsynchronousScan:
                                duration=time.perf_counter() - start,
                                options=dict(base=str(single_scan.base), output_file=str(single_scan.output_file)))
         self.write_json(single_scan.output_file, codebase)
-        log.warning(f"Scan with uuid {single_scan.uuid} has total scan time: {time.perf_counter() - start}")
+        log.info(f"Scan with uuid {single_scan.uuid} has total scan time: {time.perf_counter() - start}")
 
     async def scan_files(self, single_scan: Scan, codebase: Codebase) -> None:
         async with MergeThread(codebase) as codebase:

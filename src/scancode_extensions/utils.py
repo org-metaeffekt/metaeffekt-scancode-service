@@ -21,7 +21,7 @@ def timings(func):
         start_time = time.perf_counter()
         result = func(*args, **kwargs)
         end_time = time.perf_counter()
-        log.info(f"Execution time for {callable_name()}: {end_time - start_time}")
+        log.debug(f"Execution time for {callable_name()}: {end_time - start_time}")
         return result
 
     def callable_name():
@@ -39,7 +39,7 @@ def timings(func):
         start_time = time.perf_counter()
         result = await func(*args, **kwargs)
         end_time = time.perf_counter()
-        log.info(f"Execution time for {callable_name()}: {end_time - start_time}")
+        log.debug(f"Execution time for {callable_name()}: {end_time - start_time}")
         return result
 
     if asyncio.iscoroutine(func):
