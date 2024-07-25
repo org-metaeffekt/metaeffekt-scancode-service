@@ -250,8 +250,7 @@ def default_log_config():
 @click.option('--workers', default=1, help="Number of parallel workers.")
 @click.option('--log-config', default=default_log_config(), help="Configuration file for logging.")
 @click.option('--port', default=8000, help="Port to accept connections.")
-@click.option('--output_dir', help="Where to write output files.")
 @click.version_option(package_name="scancode_service")
-def start(log_config, workers, port, output_dir):
+def start(log_config, workers, port):
     uvicorn.run("scancode_extensions.service:app", host="0.0.0.0", port=port, workers=workers, log_config=log_config,
                 timeout_graceful_shutdown=5)
