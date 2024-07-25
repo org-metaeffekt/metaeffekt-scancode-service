@@ -11,6 +11,10 @@ Use pythons build frontend for packaging. Call from the project directory
 python -m build
 ```
 
+```bash
+python3 -m build
+```
+
 This will build a python wheel that can be installed by pip, for example.
 
 ## Installing
@@ -27,6 +31,11 @@ or if you have pipx installed, use
 
 ```bash
 python -m pipx install WHEEL_FILE 
+```
+or
+
+```bash
+pipx install WHEEL_FILE --force
 ```
 
 ## Usage
