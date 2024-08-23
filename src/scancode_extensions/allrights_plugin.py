@@ -66,6 +66,9 @@ def allrights_scanner(
     """
     from cluecode.copyrights import detect_copyrights
     from cluecode.copyrights import Detection
+    import cluecode.copyrights
+
+    cluecode.copyrights.strip_trailing_period = lambda s: s # Avoid stripping periods of detected copyrights
 
     detections = detect_copyrights(
         location,
