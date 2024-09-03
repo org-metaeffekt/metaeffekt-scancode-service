@@ -22,6 +22,7 @@ from formattedcode.output_json import JsonPrettyOutput
 from licensedcode.plugin_license import LicenseScanner
 from pydantic import BaseModel
 from scancode.api import get_licenses, get_file_info
+from starlette.concurrency import run_in_threadpool
 
 from scancode_extensions import resource
 from scancode_extensions.allrights_plugin import allrights_scanner
@@ -81,7 +82,7 @@ class AsynchronousScan:
     async def __call__(self, single_scan: Scan) -> None:
         start = time.perf_counter()
         start_time = time2tstamp()
-        codebase = await resource.create_codebase(single_scan.base)
+        codebase = await run_in_threadpool(resource.create_codebase,single_scan.base)
         await self.scan_files(single_scan, codebase)
         codebase.update_header(start_timestamp=start_time, end_timestamp=time2tstamp(),
                                duration=time.perf_counter() - start,

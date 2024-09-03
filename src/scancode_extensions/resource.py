@@ -65,7 +65,7 @@ def codebase_attributes():
 
 
 @timings
-async def create_codebase(base):
+def create_codebase(base):
     codebase = ScancodeCodebase(location=base, codebase_attributes=codebase_attributes(),
                                 resource_attributes=resource_attributes())
     codebase.save_initial_counts()
