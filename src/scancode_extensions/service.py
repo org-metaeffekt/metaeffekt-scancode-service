@@ -15,6 +15,8 @@ from threading import Thread
 from typing import Any, Callable
 
 from commoncode.timeutils import time2tstamp
+from commoncode.resource import skip_ignored
+
 from fastapi import FastAPI
 from formattedcode.output_json import JsonPrettyOutput
 from licensedcode.plugin_license import LicenseScanner
@@ -42,6 +44,8 @@ class Scan:
         for _root, dirs, files in os.walk(self.base, topdown=False):
             for name in files:
                 full_path = os.path.join(_root, name)
+                if skip_ignored(full_path):
+                    continue
                 yield ScanEvent(uuid=self.uuid, location=full_path,
                                 relative_path=compute_scanroot_relative(full_path, self.base))
 
@@ -129,6 +133,9 @@ class MergeThread(Thread):
 
         log.debug(f"Merging result for '{at}'")
         with_resource = self.codebase.get_resource(at)
+        if not with_resource:
+            log.warning(f"Resource for {at} not found. Result is: {result.items()}")
+
         merge(result.items(), with_resource)
 
         self.codebase.save_resource(with_resource)
