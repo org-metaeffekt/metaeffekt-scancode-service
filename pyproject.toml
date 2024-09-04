@@ -8,7 +8,7 @@ version = "0.2.0"
 dynamic=["dependencies"]
 
 [project.scripts]
-scancode-service = "scancode_extensions.service:start"
+scancode-service = "scancode_extensions.webserver:start"
 
 [tool.setuptools.package-data]
 "scancode_extensions.resources" = ["*.yaml"]
