@@ -15,3 +15,6 @@ scancode-service = "scancode_extensions.webserver:start"
 
 [tool.setuptools.dynamic]
 dependencies = { file = ["requirements.in"] }
+
+[tool.pytest.ini_options]
+asyncio_default_fixture_loop_scope = "function"

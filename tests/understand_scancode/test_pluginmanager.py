@@ -42,7 +42,7 @@ class TestFindPluginsNeeded:
     def save_codebase_counts(self, codebase: ScancodeCodebase):
         codebase.save_initial_counts()
         yield codebase
-        codebase.save_final_counts(strip_root=False)
+        codebase.save_final_counts(skip_root=False)
 
     @pytest.mark.parametrize("process", ["info", "copyright", "license"])
     def test_run_plugin(self, process, save_codebase_counts: ScancodeCodebase, plugins, build_cache, resources):

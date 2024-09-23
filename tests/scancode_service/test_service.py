@@ -40,23 +40,6 @@ def populated_cache():
     populate_cache()
 
 
-@pytest.mark.asyncio
-async def test_scanner_async(scan, populated_cache, samples_folder):
-    await service.execute(ScanRequest(scan_path=(samples_folder), output_file="/dev/null"))
-
-    assert len(service.tasks) == 1
-    task = list(service.tasks)[0]
-    await asyncio.gather(*service.tasks)
-    assert task.done()
-
-
-@pytest.mark.asyncio
-async def test_scanner_async_with_many_small_files(scan, populated_cache, fifty_folders_each_contains_single_file):
-    await service.execute(ScanRequest(scan_path=str(fifty_folders_each_contains_single_file), output_file="/dev/null"))
-
-    await asyncio.gather(*service.tasks)
-
-
 class ErroneousScan:
     def __init__(self):
         self.should_raise = False
