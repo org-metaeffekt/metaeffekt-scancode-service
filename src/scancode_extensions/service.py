@@ -14,9 +14,8 @@ from pathlib import Path
 from threading import Thread
 from typing import Any, Callable
 
-from commoncode.timeutils import time2tstamp
 from commoncode.resource import skip_ignored
-
+from commoncode.timeutils import time2tstamp
 from fastapi import FastAPI
 from formattedcode.output_json import JsonPrettyOutput
 from licensedcode.plugin_license import LicenseScanner
@@ -26,6 +25,7 @@ from starlette.concurrency import run_in_threadpool
 
 from scancode_extensions import resource
 from scancode_extensions.allrights_plugin import allrights_scanner
+from scancode_extensions.config import settings
 from scancode_extensions.resource import ScancodeCodebase as Codebase
 from scancode_extensions.utils import compute_scanroot_relative, timings, make_atomic
 
@@ -60,9 +60,9 @@ class ScanEvent:
 
 class AsynchronousScan:
 
-    def __init__(self, scanners: list[Callable] = None):
-        number_processes = 12
-        self.executor = ProcessPoolExecutor(number_processes)
+    def __init__(self, scanners: list[Callable] = None, processes: int = 12):
+        log.debug(f"Configuring number of processes to: {processes}.")
+        self.executor = ProcessPoolExecutor(processes)
         self.thread_executor = ThreadPoolExecutor(2)
         if not scanners:
             self.scanners = [get_file_info, get_licenses, allrights_scanner]
@@ -184,7 +184,7 @@ async def lifespan(app: FastAPI):
 tasks = set()
 
 app = FastAPI(lifespan=lifespan)
-scan = AsynchronousScan()
+scan = AsynchronousScan(processes=settings.processes)
 
 
 async def execute(scan_request: "ScanRequest"):

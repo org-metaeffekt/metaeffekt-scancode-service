@@ -36,6 +36,7 @@ pipx install WHEEL_FILE --force
 ```
 
 ## Usage
+### Configure Cache and Temporary Directories
 The service requires that a few environment variables are set. At startup, it checks if these variables exist.
 If not the service refuses to start. The variables configure the paths for ScanCode Toolkits cache, index cache 
 and temporary files.
@@ -46,8 +47,14 @@ export SCANCODE_CACHE=/var/opt/scancode/cache
 export SCANCODE_LICENSE_INDEX_CACHE=/var/opt/scancode/lcache
 ```
 You can use any paths you want. We would recommend to use different directories for each of these.
-
-After that type
+### Configure the Number of Threads Used
+To configure the number of threads used to scan the given input files there is an environment variable.
+The following line configures the service to use 6 processes in parallel, which is the default.
+```bash
+export SCANCODE_SERVIVE_PROCESSES=6
+```
+### Start the Service
+Type
 ```bash
 scancode-service
 ```
