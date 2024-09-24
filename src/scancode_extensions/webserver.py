@@ -37,3 +37,7 @@ def check_environment():
     if not licensecode_cache_dir:
         raise ValueError(
             "Please set environment variable 'SCANCODE_LICENSE_INDEX_CACHE'\n\texport SCANCODE_LICENSE_INDEX_CACHE=/path/to/index/cache")
+
+
+if __name__ == "__main__":
+    uvicorn.run("scancode_extensions.service:app", host="0.0.0.0", port=8000)
