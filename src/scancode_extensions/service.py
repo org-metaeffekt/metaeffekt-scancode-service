@@ -38,8 +38,7 @@ scancode_config = dict(output_dir="/tmp")
 class Scan:
     base: str
     output_file: str
-    results: list = field(default_factory=list)
-    uuid: uuid = field(default_factory=uuid.uuid4)
+    uuid: uuid = field(init=False, default_factory=uuid.uuid4)
 
     async def create_events(self):
         for _root, dirs, files in os.walk(self.base, topdown=False):
@@ -49,6 +48,14 @@ class Scan:
                     continue
                 yield ScanEvent(uuid=self.uuid, location=full_path,
                                 relative_path=compute_scanroot_relative(full_path, self.base))
+
+
+@dataclasses.dataclass
+class FileScan(Scan):
+
+    async def create_events(self):
+        yield ScanEvent(uuid=self.uuid, location=str(self.base),
+                        relative_path=compute_scanroot_relative(self.base, self.base))
 
 
 @dataclasses.dataclass
@@ -82,7 +89,7 @@ class AsynchronousScan:
     async def __call__(self, single_scan: Scan) -> None:
         start = time.perf_counter()
         start_time = time2tstamp()
-        codebase = await run_in_threadpool(resource.create_codebase,single_scan.base)
+        codebase = await run_in_threadpool(resource.create_codebase, single_scan.base)
         await self.scan_files(single_scan, codebase)
         codebase.update_header(start_timestamp=start_time, end_timestamp=time2tstamp(),
                                duration=time.perf_counter() - start,
@@ -188,8 +195,14 @@ scan = AsynchronousScan(processes=settings.processes)
 
 
 async def execute(scan_request: "ScanRequest"):
-    single_scan = Scan(scan_request.scan_path, scan_request.output_file)
-    log.info(f"Scan with uuid {single_scan.uuid}: Scanning dir {single_scan.base}.")
+    scan_path = scan_request.scan_path
+    output_file = scan_request.output_file
+    if os.path.isfile(scan_path):
+        single_scan = FileScan(scan_path, output_file)
+        log.info(f"Scan with uuid {single_scan.uuid}: Scanning file {single_scan.base}.")
+    else:
+        single_scan = Scan(scan_path, output_file)
+        log.info(f"Scan with uuid {single_scan.uuid}: Scanning dir {single_scan.base}.")
     await schedule_scan(single_scan)
     return single_scan.uuid
 
