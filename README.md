@@ -51,7 +51,7 @@ You can use any paths you want. We would recommend to use different directories 
 To configure the number of threads used to scan the given input files there is an environment variable.
 The following line configures the service to use 6 processes in parallel, which is the default.
 ```bash
-export SCANCODE_SERVIVE_PROCESSES=6
+export SCANCODE_SERVICE_PROCESSES=6
 ```
 ### Start the Service
 Type
