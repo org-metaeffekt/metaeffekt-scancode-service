@@ -16,7 +16,7 @@ from typing import Any, Callable
 
 from commoncode.resource import skip_ignored
 from commoncode.timeutils import time2tstamp
-from fastapi import FastAPI
+from fastapi import FastAPI, HTTPException
 from formattedcode.output_json import JsonPrettyOutput
 from licensedcode.plugin_license import LicenseScanner
 from pydantic import BaseModel
@@ -242,6 +242,8 @@ async def status():
 def get_task_status(uuid):
     uuid = str(uuid)
     task_dict = {task.get_name(): task for task in tasks}
+    if uuid not in task_dict:
+        raise HTTPException(status_code=404, detail="UUID not found")
     task = task_dict[uuid]
     return dict(uuid=uuid, status="done" if task.done() else "pending")
 
