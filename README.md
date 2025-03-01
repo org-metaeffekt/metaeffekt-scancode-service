@@ -10,6 +10,13 @@ Use pythons build frontend for packaging. Call from the project directory
 ```bash
 python -m build
 ```
+
+or
+
+```bash
+python3 -m build
+```
+
 This will build a python wheel that can be installed by pip, for example.
 
 ***Please note that in some systems python3 must be called not with the `python` command but with `python3`.***
@@ -46,6 +53,15 @@ export SCANCODE_TEMP=/var/opt/scancode/temp
 export SCANCODE_CACHE=/var/opt/scancode/cache
 export SCANCODE_LICENSE_INDEX_CACHE=/var/opt/scancode/lcache
 ```
+
+Recommended configuration on Mac:
+
+```bash
+export SCANCODE_TEMP=/var/tmp/scancode/temp
+export SCANCODE_CACHE=/var/tmp/scancode/cache
+export SCANCODE_LICENSE_INDEX_CACHE=/var/tmp/scancode/lcache
+```
+
 You can use any paths you want. We would recommend to use different directories for each of these.
 ### Configure the Number of Threads Used
 To configure the number of threads used to scan the given input files there is an environment variable.
