@@ -1,9 +1,0 @@
-scancode-toolkit==32.3.0; platform_machine == 'x86_64'
-scancode-toolkit-mini==32.3.0; platform_machine == 'arm64'
-fastapi[all]==0.115.0
-click
-pytest>=8
-pytest-asyncio
-click
-faker
-faker-file
