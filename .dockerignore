@@ -1,0 +1,14 @@
+.python-version
+.tox/
+.git/
+.idea/
+.pytest_cache/
+.gitignore/
+.venv/
+venv/
+*.egg-info/
+build/
+dist/
+tests/
+Dockerfile
+*.log
