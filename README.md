@@ -4,8 +4,8 @@ Scancode Extensions or Scancode Service is a small package to extend Scancode To
 web service that can answer any number of scan requests after launch.
 
 ## Building
-
-Use pythons build frontend for packaging. Call from the project directory
+This project uses a modern `pyproject.toml`. You can use it with any compatible packaging tool.
+I.e. use pythons build frontend for packaging. Call from the project directory
 
 ```bash
 python -m build
@@ -54,7 +54,7 @@ export SCANCODE_CACHE=/var/opt/scancode/cache
 export SCANCODE_LICENSE_INDEX_CACHE=/var/opt/scancode/lcache
 ```
 
-Recommended configuration on Mac:
+Recommended configuration on macOS:
 
 ```bash
 export SCANCODE_TEMP=/var/tmp/scancode/temp
@@ -69,6 +69,16 @@ The following line configures the service to use 6 processes in parallel, which 
 ```bash
 export SCANCODE_SERVICE_PROCESSES=6
 ```
+## Docker
+Build the image with
+```shell
+docker build -t scancode-service .
+```
+and start the container
+```shell
+docker run -p 8000:8000 --mount type=bind,source=/metaeffekt-scancode-toolkit/tests/cluecode/data/,target=/metaeffekt-scancode-toolkit/tests/cluecode/data/ scancode-service
+```
+It is important to bind mount the scan directory exactly to the same location into the container as on the host.
 ### Start the Service
 Type
 ```bash
@@ -161,14 +171,3 @@ exec /opt/scancode-service/venv/bin/scancode-service "$@"
 
 With `sudo systemctl start scancode-service` you could start the service. `sudo systemctl status scancode-service` 
 returns the current status of the service.
-## Development
-
-### Using tox
-
-One can start the service from the root directory by using
-
-```bash
-tox -e start
-```
-
-This starts scancode-service with its default parameters.
