@@ -6,8 +6,7 @@
 # See https://github.com/nexB/scancode-toolkit for support or download.
 # See https://aboutcode.org for more information about nexB OSS projects.
 #
-
-
+import re
 import sys
 
 import attr
@@ -69,6 +68,7 @@ def allrights_scanner(
     import cluecode.copyrights
 
     cluecode.copyrights.strip_trailing_period = lambda s: s # Avoid stripping periods of detected copyrights
+    cluecode.copyrights.remove_man_comment_markers = re.compile(r'^\.\\"').sub
 
     detections = detect_copyrights(
         location,
