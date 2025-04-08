@@ -18,8 +18,8 @@ from plugincode.scan import scan_impl
 
 @scan_impl
 class AllrightsCopyrightScanner(ScanPlugin):
-    """
-    Scan a Resource for copyrights.
+    """Scan a Resource for copyrights with all rights reserved. This class is an adapted version of
+    scancodes cluecode.plugin_copyright.
     """
 
     resource_attributes = dict(
@@ -59,9 +59,9 @@ def allrights_scanner(
         deadline=sys.maxsize,
         **kwargs,
 ):
-    """
-    Return a mapping with a single 'copyrights' key with a value that is a list
+    """Return a mapping with a single 'copyrights' key with a value that is a list
     of mappings for copyright detected in the file at `location`.
+    Adapted copy of scancodes scancode.api.get_copyrights.
     """
     from cluecode.copyrights import detect_copyrights
     from cluecode.copyrights import Detection
