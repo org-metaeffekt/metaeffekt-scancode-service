@@ -68,7 +68,7 @@ def allrights_scanner(
     import cluecode.copyrights
 
     cluecode.copyrights.strip_trailing_period = lambda s: s # Avoid stripping periods of detected copyrights
-    cluecode.copyrights.remove_man_comment_markers = re.compile(r'^\.\\"').sub
+    cluecode.copyrights.remove_man_comment_markers = re.compile(r'^\.\\"').sub # Recognize man page comments
 
     detections = detect_copyrights(
         location,
