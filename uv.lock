@@ -1328,6 +1328,7 @@ source = { editable = "." }
 dependencies = [
     { name = "click" },
     { name = "fastapi", extra = ["all"] },
+    { name = "pyyaml" },
     { name = "scancode-toolkit", marker = "platform_machine == 'x86_64'" },
     { name = "scancode-toolkit-mini", marker = "platform_machine == 'aarch64' or platform_machine == 'arm64'" },
 ]
@@ -1344,6 +1345,7 @@ dev = [
 requires-dist = [
     { name = "click", specifier = "<8.1.8" },
     { name = "fastapi", extras = ["all"], specifier = "==0.115.11" },
+    { name = "pyyaml", specifier = ">=6.0.2" },
     { name = "scancode-toolkit", marker = "platform_machine == 'x86_64'", specifier = "==32.3.2" },
     { name = "scancode-toolkit-mini", marker = "platform_machine == 'aarch64'", specifier = "==32.3.2" },
     { name = "scancode-toolkit-mini", marker = "platform_machine == 'arm64'", specifier = "==32.3.2" },
