@@ -1,7 +1,15 @@
-# Scancode Extensions
+# metaeffekt-scancode-service
 
-Scancode Extensions or Scancode Service is a small package to extend Scancode Toolkit. At the heart of the package is a
-web service that can answer any number of scan requests after launch.
+The metaeffekt-scancode-service is a service using and extendind the AboutCode ScanCode Toolkit. At the core 
+metaeffekt-scancode-service package is a web service that can answer any number of scan requests after launch.
+
+Using the ScanCode Toolkit on command-line-level comes with a certain penalty for bootstrapping the scan. To avoid
+these costs a local service is established that performs the bootstrapping on startup and then can happily can be used
+to execute scans on the local filesystem.
+
+Furthermore, we activate/add some features of ScanCode that are otherwise not easily accessible:
+* Including all rights reserved in copyright statements
+* Preserve punctuation in copyright statements
 
 ## Building
 This project uses a modern `pyproject.toml`. You can use it with any compatible packaging tool.
@@ -55,7 +63,6 @@ export SCANCODE_LICENSE_INDEX_CACHE=/var/opt/scancode/lcache
 ```
 
 Recommended configuration on macOS:
-
 ```bash
 export SCANCODE_TEMP=/var/tmp/scancode/temp
 export SCANCODE_CACHE=/var/tmp/scancode/cache
@@ -63,12 +70,14 @@ export SCANCODE_LICENSE_INDEX_CACHE=/var/tmp/scancode/lcache
 ```
 
 You can use any paths you want. We would recommend to use different directories for each of these.
+
 ### Configure the Number of Threads Used
 To configure the number of threads used to scan the given input files there is an environment variable.
 The following line configures the service to use 6 processes in parallel, which is the default.
 ```bash
 export SCANCODE_SERVICE_PROCESSES=6
 ```
+
 ## Docker
 Build the image with
 ```shell
@@ -87,21 +96,19 @@ scancode-service
 
 which will start the service. 
 
-At [http://localhost:8000/docs](http://localhost:8000/docs) you will find a documentation
-of the API.
-Scan requests can be initiated by a post request to [http://localhost:8000/scan](http://localhost:8000/scan). For the
-status
-of the service and an overview over the current scans send a get request
-to [http://localhost:8000/scan](http://localhost:8000/scan).
+At [http://localhost:8000/docs](http://localhost:8000/docs) you will find a documentation of the API. Scan requests can be initiated by a 
+post request to [http://localhost:8000/scan](http://localhost:8000/scan). For the  status of the service and an overview over the current 
+scans send a get request to [http://localhost:8000/scan](http://localhost:8000/scan).
+
 ### Run as Systemd Service
 Given one has installed Scancode Extensions into `/var/opt/scancode-service` with permissions for user `scancode`.
 The following example configuration could help to start it as a systemd service.
 
-Create file `/etc/systemd/system/scancode-service.service` with the following content.
+Create file `/etc/systemd/system/metaeffekt-scancode.service` with the following content.
 
 ```shell
 [Unit]
-Description=Scancode Http Service
+Description=metaeffekt scancode service
 ## make sure we only start the service after network is up
 Wants=network-online.target
 After=network.target
@@ -113,7 +120,7 @@ Environment=SCANCODE_CACHE=/var/opt/scancode/cache
 Environment=SCANCODE_LICENSE_INDEX_CACHE=/var/opt/scancode/lcache
 Environment=UVICORN_LOG_CONFIG=/var/opt/scancode/logging.yaml
 Type=notify
-ExecStart=/opt/scancode-service/scancode-service.sh --log-config /opt/scancode-service/logging.yaml
+ExecStart=/opt/metaeffekt/scancode/scancode-service.sh --log-config /opt/metaeffekt/scancode/logging.yaml
 WatchdogSec=60
 Restart=on-watchdog
 User=scancode
@@ -126,7 +133,7 @@ StandardOutput=journal
 WantedBy=multi-user.target
 ```
 
-Next create `/opt/scancode-service/scancode-service.sh` and insert the following.
+Next create `/opt/metaeffekt/scancode/scancode-service.sh` and insert the following.
 
 ```shell
 #!/usr/bin/env bash
@@ -153,7 +160,7 @@ function watchdog() {
             fi
 
             "${SD_NOTIFY}" WATCHDOG=1
-            "${SD_NOTIFY}" STATUS="Scancode-service is ${beat}. Active scans: ${current_scans}."
+            "${SD_NOTIFY}" STATUS="metaeffekt-scancode-service is ${beat}. Active scans: ${current_scans}."
         else
             "${SD_NOTIFY}" WATCHDOG=trigger
             "${SD_NOTIFY}" STATUS=Beat not responding
@@ -166,8 +173,13 @@ function watchdog() {
 
 watchdog &
 
-exec /opt/scancode-service/venv/bin/scancode-service "$@"
+exec /opt/metaeffekt/scancode/venv/bin/scancode-service "$@"
 ```
 
-With `sudo systemctl start scancode-service` you could start the service. `sudo systemctl status scancode-service` 
+With `sudo systemctl start metaeffekt-scancode` you could start the service. `sudo systemctl status metaeffekt-scancode` 
 returns the current status of the service.
+
+# License
+The original ScanCode Toolkit code is licensed under Apache License 2.0. The modification, extensions and configuration
+of the metaeffekt-scancode-service are also provided under Apache License 2.0. Please see the [LICENSE](LICENSE) and 
+[NOTICE](NOTICE) file for details.

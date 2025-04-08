@@ -1,0 +1,15 @@
+metaeffekt-scancode-service
+===========================
+
+The metaeffekt-scancode-service is an extension to the AboutCode ScanCode Toolkit:
+
+    https://github.com/aboutcode-org/scancode-toolkit
+
+As such it is based on code originating from ScanCode Toolkit with modifications.
+
+The original code of the ScanCode Toolkit is licensed under Apache License 2.0.
+
+The metaeffekt modifications and additions are licensed under Apache License 2.0.
+
+The source code is supplied in src/scancode_extensions and contains headers and hints and remarks towards the original
+source of the code.
