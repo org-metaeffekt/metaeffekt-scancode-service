@@ -182,4 +182,4 @@ returns the current status of the service.
 # License
 The original ScanCode Toolkit code is licensed under Apache License 2.0. The modification, extensions and configuration
 of the metaeffekt-scancode-service are also provided under Apache License 2.0. Please see the [LICENSE](LICENSE) and 
-[NOTICE](NOTICE) file for details.
+[NOTICE](NOTICE) files for details.
