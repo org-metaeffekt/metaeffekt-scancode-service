@@ -1,4 +1,10 @@
 #
+# This code is heavily inspired by original code from ScanCode Toolkit.
+# The copyright header is therefore propagated. The content is primarily
+# taken from following packages in the ScanCode Toolkit:
+# - cluecode.plugin_copyright
+# - scancode.api
+#
 # Copyright (c) nexB Inc. and others. All rights reserved.
 # ScanCode is a trademark of nexB Inc.
 # SPDX-License-Identifier: Apache-2.0
@@ -88,5 +94,4 @@ def allrights_scanner(
         ('authors', authors),
     ])
 
-    # TODO: do something if we missed the deadline
     return results
