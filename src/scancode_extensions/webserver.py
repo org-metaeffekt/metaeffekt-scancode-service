@@ -54,4 +54,4 @@ def check_environment():
 
 
 if __name__ == "__main__":
-    uvicorn.run("scancode_extensions.service:app", host="0.0.0.0", port=8000)
+    uvicorn.run("scancode_extensions.service:app", host="0.0.0.0", port=8000, log_config=str(default_log_config()))
