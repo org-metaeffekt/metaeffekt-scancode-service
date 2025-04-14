@@ -43,6 +43,8 @@ from scancode_extensions.config import settings
 from scancode_extensions.resource import ScancodeCodebase as Codebase
 from scancode_extensions.utils import compute_scanroot_relative, timings, make_atomic
 
+DELTA_T = 10
+
 log = logging.getLogger("scanservice")
 
 scancode_config = dict(output_dir="/tmp")
@@ -127,7 +129,7 @@ class AsynchronousScan:
         log.debug(f"File {single_file.relative_path} scan {single_file.uuid} requested for.")
 
         loop = asyncio.get_event_loop()
-        single_file_task = [loop.run_in_executor(self.executor, _scan, single_file.location) for _scan in self.scanners]
+        single_file_task = [loop.run_in_executor(self.executor, partial(_scan, deadline=time.time() + int(DELTA_T)), single_file.location) for _scan in self.scanners]
         results = await asyncio.gather(*single_file_task)
         result = reduce(operator.ior, results, {})
         await write(single_file.relative_path, result)
