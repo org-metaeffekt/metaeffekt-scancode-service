@@ -43,8 +43,6 @@ from scancode_extensions.config import settings
 from scancode_extensions.resource import ScancodeCodebase as Codebase
 from scancode_extensions.utils import compute_scanroot_relative, timings, make_atomic
 
-DELTA_T = 10
-
 log = logging.getLogger("scanservice")
 
 scancode_config = dict(output_dir="/tmp")
@@ -83,10 +81,12 @@ class ScanEvent:
 
 class AsynchronousScan:
 
-    def __init__(self, scanners: list[Callable] = None, processes: int = 12):
-        log.debug(f"Configuring number of processes to: {processes}.")
+    def __init__(self, scanners: list[Callable] = None, processes: int = 6, delta_t: int = 10):
+        log.info(f"Configuring number of processes to: {processes}.")
+        log.info(f"Configuring delta_t for scan deadlines to: {delta_t}.")
         self.executor = ProcessPoolExecutor(processes)
         self.thread_executor = ThreadPoolExecutor(2)
+        self.delta_t = delta_t
         if not scanners:
             self.scanners = [get_file_info, get_licenses, allrights_scanner]
         else:
@@ -129,7 +129,7 @@ class AsynchronousScan:
         log.debug(f"File {single_file.relative_path} scan {single_file.uuid} requested for.")
 
         loop = asyncio.get_event_loop()
-        single_file_task = [loop.run_in_executor(self.executor, partial(_scan, deadline=time.time() + int(DELTA_T)), single_file.location) for _scan in self.scanners]
+        single_file_task = [loop.run_in_executor(self.executor, partial(_scan, deadline=time.time() + int(self.delta_t)), single_file.location) for _scan in self.scanners]
         results = await asyncio.gather(*single_file_task)
         result = reduce(operator.ior, results, {})
         await write(single_file.relative_path, result)
@@ -201,7 +201,7 @@ async def lifespan(app: FastAPI):
 tasks = set()
 
 app = FastAPI(lifespan=lifespan)
-scan = AsynchronousScan(processes=settings.processes)
+scan = AsynchronousScan(processes=settings.processes, delta_t=settings.delta_t)
 
 
 async def execute(scan_request: "ScanRequest"):
