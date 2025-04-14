@@ -127,11 +127,8 @@ class AsynchronousScan:
         log.debug(f"File {single_file.relative_path} scan {single_file.uuid} requested for.")
 
         loop = asyncio.get_event_loop()
-        tasks = []
-        for _scan in self.scanners:
-            task = loop.run_in_executor(self.executor, _scan, single_file.location)
-            tasks.append(task)
-        results = await asyncio.gather(*tasks)
+        single_file_task = [loop.run_in_executor(self.executor, _scan, single_file.location) for _scan in self.scanners]
+        results = await asyncio.gather(*single_file_task)
         result = reduce(operator.ior, results, {})
         await write(single_file.relative_path, result)
 
