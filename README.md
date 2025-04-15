@@ -78,6 +78,18 @@ The following line configures the service to use 6 processes in parallel, which 
 export SCANCODE_SERVICE_PROCESSES=6
 ```
 
+### Configure Scancodes Deadline
+Scancode-Toolkit can sometimes take an excessive amount of time to scan large files, which can lead to long wait times for the scan results.
+
+To address this issue, Scancode-Toolkit provides a 'deadline' parameter that can be used to stop a scan after a certain amount of time.
+
+The `deadline` is calculated by adding a time delta to the current timestamp. This delta can be configured using an environment variable named `SCANCODE_SERVICE_DELTA_T`.
+That environment variable is used to set the time delta (in seconds) that is added to the current timestamp to determine the `deadline` for the Scancode-Toolkit scan.
+
+Configure the delta as following:
+```commandline
+export SCANCODE_SERVICE_DELTA_T=48
+```
 ## Docker
 Build the image with
 ```shell
