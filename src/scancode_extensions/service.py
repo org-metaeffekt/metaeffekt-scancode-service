@@ -129,10 +129,13 @@ class AsynchronousScan:
         log.debug(f"File {single_file.relative_path} scan {single_file.uuid} requested for.")
 
         loop = asyncio.get_event_loop()
-        single_file_task = [loop.run_in_executor(self.executor, partial(_scan, deadline=time.time() + int(self.delta_t)), single_file.location) for _scan in self.scanners]
+        single_file_task = [loop.run_in_executor(self.executor, partial(_scan, deadline=self.calculate_deadline()), single_file.location) for _scan in self.scanners]
         results = await asyncio.gather(*single_file_task)
         result = reduce(operator.ior, results, {})
         await write(single_file.relative_path, result)
+
+    def calculate_deadline(self):
+        return time.time() + int(self.delta_t)
 
 
 class MergeThread(Thread):
