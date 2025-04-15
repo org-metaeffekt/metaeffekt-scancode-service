@@ -35,6 +35,7 @@ EXPOSE 8000
 RUN apt-get update \
         && apt-get install -y --no-install-recommends \
         libmagic1 \
+        libgomp1 \
         && rm -rf /var/lib/apt/lists/*
 
 COPY --from=build-stage --chown=app:app /app /app
