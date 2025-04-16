@@ -10,9 +10,8 @@ dependencies = [
     "click<8.1.8",
     "fastapi[all]==0.115.11",
     "pyyaml>=6.0.2",
-    "scancode-toolkit==32.3.2 ; platform_machine == 'x86_64'",
-    "scancode-toolkit-mini==32.3.2 ; platform_machine == 'aarch64'",
-    "scancode-toolkit-mini==32.3.2 ; platform_machine == 'arm64'",
+    "scancode-toolkit==32.3.3 ; platform_machine == 'x86_64'",
+    "scancode-toolkit-mini==32.3.2 ; platform_machine == 'aarch64' or platform_machine == 'arm64'",
 ]
 
 [project.scripts]
@@ -23,6 +22,10 @@ scancode-service = "scancode_extensions.webserver:start"
 
 [tool.pytest.ini_options]
 asyncio_default_fixture_loop_scope = "function"
+log_cli = "True"
+log_cli_level = "DEBUG"
+
+
 
 [dependency-groups]
 dev = [

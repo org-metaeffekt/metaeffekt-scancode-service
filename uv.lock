@@ -1323,7 +1323,7 @@ wheels = [
 
 [[package]]
 name = "scancode-service"
-version = "0.3.0"
+version = "0.5.0"
 source = { editable = "." }
 dependencies = [
     { name = "click" },
@@ -1346,9 +1346,8 @@ requires-dist = [
     { name = "click", specifier = "<8.1.8" },
     { name = "fastapi", extras = ["all"], specifier = "==0.115.11" },
     { name = "pyyaml", specifier = ">=6.0.2" },
-    { name = "scancode-toolkit", marker = "platform_machine == 'x86_64'", specifier = "==32.3.2" },
-    { name = "scancode-toolkit-mini", marker = "platform_machine == 'aarch64'", specifier = "==32.3.2" },
-    { name = "scancode-toolkit-mini", marker = "platform_machine == 'arm64'", specifier = "==32.3.2" },
+    { name = "scancode-toolkit", marker = "platform_machine == 'x86_64'", specifier = "==32.3.3" },
+    { name = "scancode-toolkit-mini", marker = "platform_machine == 'aarch64' or platform_machine == 'arm64'", specifier = "==32.3.2" },
 ]
 
 [package.metadata.requires-dev]
@@ -1361,11 +1360,11 @@ dev = [
 
 [[package]]
 name = "scancode-toolkit"
-version = "32.3.2"
+version = "32.3.3"
 source = { registry = "https://pypi.org/simple" }
 dependencies = [
     { name = "attrs", marker = "platform_machine == 'x86_64'" },
-    { name = "beautifulsoup4", marker = "platform_machine == 'x86_64'" },
+    { name = "beautifulsoup4", extra = ["chardet"], marker = "platform_machine == 'x86_64'" },
     { name = "boolean-py", marker = "platform_machine == 'x86_64'" },
     { name = "chardet", marker = "platform_machine == 'x86_64'" },
     { name = "click", marker = "platform_machine == 'x86_64'" },
@@ -1412,10 +1411,10 @@ dependencies = [
     { name = "urlpy", marker = "platform_machine == 'x86_64'" },
     { name = "xmltodict", marker = "platform_machine == 'x86_64'" },
 ]
-sdist = { url = "https://files.pythonhosted.org/packages/a7/73/caadb99a0620de2e84e4e83e434863ad2443fac905afb392721e65685bb5/scancode-toolkit-32.3.2.tar.gz", hash = "sha256:4899cc274766228dcb6ce0a68321252debcdb0bdf91f520c71c7ef5516b47b3f", size = 15369833 }
+sdist = { url = "https://files.pythonhosted.org/packages/23/ca/937d49bbb9c0d554e7ebc7695deae0e63713b150ff31874b89fd17ae1fce/scancode-toolkit-32.3.3.tar.gz", hash = "sha256:ace411f5186cb226e8e8cf24a2f9442555217cb8ba49b74fe11c8d396b139c25", size = 15443636 }
 wheels = [
-    { url = "https://files.pythonhosted.org/packages/ad/3d/983816558af4de57f4601e5ed029a6539792d887b67a429ee685e53f1449/scancode_toolkit-32.3.2-cp311-none-any.whl", hash = "sha256:44294bf04e8318eb20cfbdb2ed18acdfb1f2f9a375be5d3385454d9e90ca4618", size = 114707217 },
-    { url = "https://files.pythonhosted.org/packages/dc/54/f274bfa13664dd5dfffbaa225dca4b5c4b4471bd380ff21b86f763eadec6/scancode_toolkit-32.3.2-cp312-none-any.whl", hash = "sha256:8e23399473d4b5cc82a91da9cc1ed6935d48798fc1b5b460b7969a10b3a88b22", size = 114707294 },
+    { url = "https://files.pythonhosted.org/packages/24/8a/1b955f67422e51547f02681cc99974889d5ca2a7a80672179701d94ff913/scancode_toolkit-32.3.3-cp311-none-any.whl", hash = "sha256:848a6c70ff13ca05bc04683f3bebb970c70ef35eed7e3c44563963223ed5e1a6", size = 115747519 },
+    { url = "https://files.pythonhosted.org/packages/84/92/1d10630216041fa5a5fda016e9352fbba9198e645e0661dcfeb645eb8e61/scancode_toolkit-32.3.3-cp312-none-any.whl", hash = "sha256:a54e83a94d47986eda8d891eda4a89090392177baa3d53c794cc3b28e1e3fc40", size = 115747745 },
 ]
 
 [[package]]
