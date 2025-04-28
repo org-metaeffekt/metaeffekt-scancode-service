@@ -218,6 +218,7 @@ async def execute(scan_request: "ScanRequest"):
         log.info(f"Scan with uuid {single_scan.uuid}: Scanning dir {single_scan.base}.")
     else:
         raise HTTPException(400, f"File or directory '{scan_path}' of variable 'scan_path' not found.")
+    log.info(f"Writing scan result for {single_scan.uuid} into {single_scan.output_file}.")
     await schedule_scan(single_scan)
     return single_scan.uuid
 
