@@ -25,12 +25,21 @@ RUN --mount=type=cache,target=/root/.cache/uv \
 
 FROM python:3.12-slim-bookworm
 
+ARG UID=1000
+ARG GID=1000
+
 ENV SCANCODE_TEMP=/scancode/temp
 ENV SCANCODE_CACHE=/scancode/cache
 ENV SCANCODE_LICENSE_INDEX_CACHE=/scancode/lcache
 
-RUN mkdir -p /scancode/{temp,cache,lcache}
 EXPOSE 8000
+
+RUN groupadd -g "${GID}" python \
+  && useradd --create-home --no-log-init -u "${UID}" -g "${GID}" python
+
+RUN bash -c 'mkdir -p /scancode/{temp,cache,lcache}'
+
+RUN chown -R python:python /scancode
 
 RUN apt-get update \
         && apt-get install -y --no-install-recommends \
@@ -38,12 +47,9 @@ RUN apt-get update \
         libgomp1 \
         && rm -rf /var/lib/apt/lists/*
 
-COPY --from=build-stage --chown=app:app /app /app
+USER python
+COPY --from=build-stage --chown=python:python /app /app
 
 ENV PATH="/app/.venv/bin:$PATH"
-# COPY --from=build-stage /app/src /app/src
-# COPY --from=build-stage /app/.venv /app/.venv
-# COPY --from=build-stage /app/pyproject.toml /app/pyproject.toml
-
 
 CMD ["scancode-service"]

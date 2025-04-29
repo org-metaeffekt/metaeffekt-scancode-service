@@ -11,11 +11,6 @@ handlers:
     level: INFO
     formatter: simple
     stream: ext://sys.stderr
-  file:
-    class: logging.handlers.RotatingFileHandler
-    level: INFO
-    formatter: simple
-    filename: scancode-service.log
 loggers:
   uvicorn:
     level: INFO
@@ -25,4 +20,3 @@ loggers:
     level: INFO
     handlers:
     - stderr
-    - file
