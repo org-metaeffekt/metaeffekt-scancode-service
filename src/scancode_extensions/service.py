@@ -121,9 +121,12 @@ class AsynchronousScan:
 
     async def scan_files(self, single_scan: Scan, codebase: Codebase) -> None:
         async with MergeThread(codebase) as codebase:
-            async with asyncio.TaskGroup() as tg:
-                async for single_file in single_scan.create_events():
-                        tg.create_task(self.scan_file(single_file, codebase.write))
+            tasks = []
+            async for single_file in single_scan.create_events():
+                tasks.append(
+                    self.scan_file(single_file, codebase.write)
+                )
+            await asyncio.gather(*tasks)
 
     async def scan_file(self, single_file: ScanEvent, write):
         log.debug(f"File {single_file.relative_path} scan {single_file.uuid} requested for.")
