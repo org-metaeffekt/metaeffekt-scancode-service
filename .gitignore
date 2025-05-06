@@ -4,6 +4,7 @@ __pycache__
 .vscode
 .tox
 .idea
+.python-version
 venv/
 dist/
 *.log
