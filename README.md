@@ -1,6 +1,6 @@
 # metaeffekt-scancode-service
 
-The metaeffekt-scancode-service is a service using and extendind the AboutCode ScanCode Toolkit. At the core
+The metaeffekt-scancode-service is a service using and extending the AboutCode ScanCode Toolkit. At the core
 metaeffekt-scancode-service package is a web service that can answer any number of scan requests after launch.
 
 Using the ScanCode Toolkit on command-line-level comes with a certain penalty for bootstrapping the scan. To avoid
