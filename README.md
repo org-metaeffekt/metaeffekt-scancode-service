@@ -1,7 +1,8 @@
 # metaeffekt-scancode-service
 
-The metaeffekt-scancode-service is a service using and extendind the AboutCode ScanCode Toolkit. At the core 
-metaeffekt-scancode-service package is a web service that can answer any number of scan requests after launch.
+The metaeffekt-scancode-service is a service using and extending the
+[AboutCode ScanCode Toolkit](https://github.com/nexB/scancode-toolkit). At the core metaeffekt-scancode-service package
+is a web service that can answer any number of scan requests after launch.
 
 Using the ScanCode Toolkit on command-line-level comes with a certain penalty for bootstrapping the scan. To avoid
 these costs a local service is established that performs the bootstrapping on startup and then can happily can be used
@@ -42,7 +43,7 @@ python -m pip install WHEEL_FILE
 or if you have pipx installed, use
 
 ```bash
-python -m pipx install WHEEL_FILE 
+python -m pipx install WHEEL_FILE
 ```
 or
 
@@ -53,7 +54,7 @@ pipx install WHEEL_FILE --force
 ## Usage
 ### Configure Cache and Temporary Directories
 The service requires that a few environment variables are set. At startup, it checks if these variables exist.
-If not the service refuses to start. The variables configure the paths for ScanCode Toolkits cache, index cache 
+If not the service refuses to start. The variables configure the paths for ScanCode Toolkits cache, index cache
 and temporary files.
 To configure these use
 ```bash
@@ -106,10 +107,10 @@ Type
 scancode-service
 ```
 
-which will start the service. 
+which will start the service.
 
-At [http://localhost:8000/docs](http://localhost:8000/docs) you will find a documentation of the API. Scan requests can be initiated by a 
-post request to [http://localhost:8000/scan](http://localhost:8000/scan). For the  status of the service and an overview over the current 
+At [http://localhost:8000/docs](http://localhost:8000/docs) you will find a documentation of the API. Scan requests can be initiated by a
+post request to [http://localhost:8000/scan](http://localhost:8000/scan). For the  status of the service and an overview over the current
 scans send a get request to [http://localhost:8000/scan](http://localhost:8000/scan).
 
 ### Run as Systemd Service
@@ -188,10 +189,10 @@ watchdog &
 exec /opt/metaeffekt/scancode/venv/bin/scancode-service "$@"
 ```
 
-With `sudo systemctl start metaeffekt-scancode` you could start the service. `sudo systemctl status metaeffekt-scancode` 
+With `sudo systemctl start metaeffekt-scancode` you could start the service. `sudo systemctl status metaeffekt-scancode`
 returns the current status of the service.
 
 # License
 The original ScanCode Toolkit code is licensed under Apache License 2.0. The modification, extensions and configuration
-of the metaeffekt-scancode-service are also provided under Apache License 2.0. Please see the [LICENSE](LICENSE) and 
+of the metaeffekt-scancode-service are also provided under Apache License 2.0. Please see the [LICENSE](LICENSE) and
 [NOTICE](NOTICE) files for details.
