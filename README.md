@@ -12,6 +12,12 @@ Furthermore, we activate/add some features of ScanCode that are otherwise not ea
 * Including all rights reserved in copyright statements
 * Preserve punctuation in copyright statements
 
+## Quick Start
+
+Running the scancode-service as a local service, in a non-containerized manner as described below, the [quick-start.sh](quick-start.sh) script
+can be utilized to get up-and-running quickly. The script builds the python project and utilizes the default parameters described in the sections 
+below. The default working directory however, will be a subdirectory of this project to avoid permission conflicts.
+
 ## Building
 This project uses a modern `pyproject.toml`. You can use it with any compatible packaging tool.
 I.e. use pythons build frontend for packaging. Call from the project directory
