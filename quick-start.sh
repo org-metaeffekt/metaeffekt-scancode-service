@@ -20,6 +20,14 @@ if [ -z "$PYTHON" ]; then
     exit 1
 fi
 
+# Create virtual environment if it doesn't exist
+if [ ! -d "$VENV_PATH" ]; then
+    "$PYTHON" -m venv "$VENV_NAME"
+fi
+
+. "$VENV_PATH/bin/activate"
+
+# Build inside the venv to avoid externally-managed-environment issues on macOS
 "$PYTHON" -m pip install build --quiet
 "$PYTHON" -m build
 
@@ -30,12 +38,7 @@ if [ -z "$WHL_FILE" ] || [ ! -f "$WHL_FILE" ]; then
     exit 1
 fi
 
-# Create virtual environment if it doesn't exist
-if [ ! -d "$VENV_PATH" ]; then
-    "$PYTHON" -m venv "$VENV_NAME"
-fi
-
-. "$VENV_PATH/bin/activate"
+# Install the wheel into the venv
 "$PYTHON" -m pip install "$WHL_FILE"
 
 # Create local data directories (project-local instead of ~/scancode-service/
