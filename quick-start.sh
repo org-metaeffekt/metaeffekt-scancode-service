@@ -20,6 +20,7 @@ if [ -z "$PYTHON" ]; then
     exit 1
 fi
 
+"$PYTHON" -m pip install build --quiet
 "$PYTHON" -m build
 
 # Dynamically resolve the .whl file from the dist directory
