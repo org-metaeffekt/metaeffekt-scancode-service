@@ -239,6 +239,10 @@ async def schedule_task(coro, name):
         async def coro():
             await asyncio.sleep(30)
             tasks.discard(fut)
+            exception = fut.exception()
+            if exception:
+                log.error(f"Task {name} had the following error:\n{exception}.")
+
 
         asyncio.create_task(coro())
 
