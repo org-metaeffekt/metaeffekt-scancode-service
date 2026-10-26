@@ -14,6 +14,7 @@
 
 import asyncio
 import dataclasses
+import datetime
 import logging
 import operator
 import os
@@ -37,10 +38,11 @@ from pydantic import BaseModel
 from scancode.api import get_licenses, get_file_info
 from starlette.concurrency import run_in_threadpool
 
-from scancode_extensions import resource
+from scancode_extensions import resource, task_monitor
 from scancode_extensions.allrights_plugin import allrights_scanner
 from scancode_extensions.config import settings
 from scancode_extensions.resource import ScancodeCodebase as Codebase
+from scancode_extensions.task_monitor import TaskInfo
 from scancode_extensions.utils import compute_scanroot_relative, timings, make_atomic
 
 log = logging.getLogger("scanservice")
@@ -60,7 +62,7 @@ class Scan:
                 full_path = os.path.join(_root, name)
                 if skip_ignored(full_path):
                     continue
-                yield ScanEvent(uuid=self.uuid, location=full_path,
+                yield ScanEvent(uuid=self.uuid, event_id=uuid.uuid4(), location=full_path,
                                 relative_path=compute_scanroot_relative(full_path, self.base))
 
 
@@ -68,13 +70,14 @@ class Scan:
 class FileScan(Scan):
 
     async def create_events(self):
-        yield ScanEvent(uuid=self.uuid, location=str(self.base),
+        yield ScanEvent(uuid=self.uuid, event_id=uuid.uuid4(), location=str(self.base),
                         relative_path=compute_scanroot_relative(self.base, self.base))
 
 
 @dataclasses.dataclass
 class ScanEvent:
     uuid: str
+    event_id: str
     location: str
     relative_path: str
 
@@ -130,12 +133,14 @@ class AsynchronousScan:
 
     async def scan_file(self, single_file: ScanEvent, write):
         log.debug(f"File {single_file.relative_path} scan {single_file.uuid} requested for.")
+        task_monitor.put_task(single_file.event_id, TaskInfo(str(single_file.uuid), datetime.datetime.now(tz=datetime.timezone.utc), single_file.location, single_file.relative_path))
 
         loop = asyncio.get_event_loop()
         single_file_task = [loop.run_in_executor(self.executor, partial(_scan, deadline=self.calculate_deadline()), single_file.location) for _scan in self.scanners]
         results = await asyncio.gather(*single_file_task)
         result = reduce(operator.ior, results, {})
         await write(single_file.relative_path, result)
+        task_monitor.remove_task(single_file.event_id)
 
     def calculate_deadline(self):
         return time.time() + int(self.delta_t)
@@ -235,10 +240,11 @@ async def schedule_scan(single_scan: Scan, default_scan=None):
 
 
 async def schedule_task(coro, name):
-    def discard(fut):
+    def discard(fut: asyncio.Task):
         async def coro():
             await asyncio.sleep(30)
             tasks.discard(fut)
+            task_monitor.remove_all_tasks(fut.get_name())
             exception = fut.exception()
             if exception:
                 log.error(f"Task {name} had the following error:\n{exception}.")
@@ -282,3 +288,7 @@ async def scan_file(scan_request: ScanRequest) -> Any:
     scan_request_dict = scan_request.model_dump()
     scan_request_dict.update({"uuid": uuid})
     return scan_request_dict
+
+@app.get("/monitor/")
+async def monitor() -> Any:
+    return task_monitor.get_all()
