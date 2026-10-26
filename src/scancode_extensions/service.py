@@ -111,7 +111,7 @@ class AsynchronousScan:
                                duration=time.perf_counter() - start,
                                options=dict(base=str(single_scan.base), output_file=str(single_scan.output_file)))
         await self.add_license_detections(codebase)
-        self.write_json(single_scan.output_file, codebase)
+        self.write_json(Path(single_scan.output_file), codebase)
         log.info(f"Scan with uuid {single_scan.uuid} has total scan time: {time.perf_counter() - start}")
 
     @staticmethod
@@ -226,7 +226,7 @@ async def execute(scan_request: "ScanRequest"):
     return single_scan.uuid
 
 
-async def schedule_scan(single_scan, default_scan=None):
+async def schedule_scan(single_scan: Scan, default_scan=None):
     if not default_scan:
         default_scan = scan
     coro = default_scan(single_scan)
@@ -242,7 +242,6 @@ async def schedule_task(coro, name):
             exception = fut.exception()
             if exception:
                 log.error(f"Task {name} had the following error:\n{exception}.")
-
 
         asyncio.create_task(coro())
 
@@ -280,6 +279,6 @@ async def status(uuid: str):
 @app.post("/scan/")
 async def scan_file(scan_request: ScanRequest) -> Any:
     uuid = await execute(scan_request)
-    scan_request_dict = scan_request.dict()
+    scan_request_dict = scan_request.model_dump()
     scan_request_dict.update({"uuid": uuid})
     return scan_request_dict
