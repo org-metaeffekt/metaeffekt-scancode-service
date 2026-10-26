@@ -1,4 +1,4 @@
-FROM ghcr.io/astral-sh/uv:python3.12-bookworm-slim AS build-stage
+FROM astral/uv:python3.12-bookworm-slim AS build-stage
 
 ENV UV_COMPILE_BYTECODE=1 UV_LINK_MODE=copy
 
