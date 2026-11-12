@@ -13,6 +13,8 @@
 #  limitations under the License.
 
 import functools
+import importlib.metadata
+
 import scancode_config
 
 from cluecode.plugin_copyright import CopyrightScanner
@@ -49,7 +51,7 @@ class ScancodeCodebase(Codebase):
         cle.tool_name = 'scancode-toolkit'
         cle.tool_version = scancode_config.__version__
         cle.output_format_version = scancode_config.__output_format_version__
-        cle.notice = "Executed within scancode-service."
+        cle.notice = f"Executed within scancode-service-{importlib.metadata.version('scancode-service')}."
         cle.options = kwargs.get("options")
         # useful for debugging
         cle.extra_data['system_environment'] = get_system_environment()
