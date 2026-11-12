@@ -18,6 +18,7 @@ import datetime
 import logging
 import operator
 import os
+import sys
 import time
 import uuid
 from concurrent.futures import ProcessPoolExecutor
@@ -84,12 +85,16 @@ class ScanEvent:
 
 class AsynchronousScan:
 
-    def __init__(self, scanners: list[Callable] = None, processes: int = 6, delta_t: int = 10):
+    def __init__(self, scanners: list[Callable] = None, processes: int = 6, delta_t: int = None):
         log.info(f"Configuring number of processes to: {processes}.")
-        log.info(f"Configuring delta_t for scan deadlines to: {delta_t}.")
+        if delta_t:
+            self.delta_t = delta_t
+            log.info(f"Configuring delta_t for scan deadlines to: {self.delta_t}.")
+        else:
+            self.delta_t = sys.maxsize
+            log.info(f"No configuration for delta_t. Using {self.delta_t} for scan deadlines.")
         self.executor = ProcessPoolExecutor(processes)
         self.thread_executor = ThreadPoolExecutor(2)
-        self.delta_t = delta_t
         if not scanners:
             self.scanners = [get_file_info, get_licenses, allrights_scanner]
         else:
